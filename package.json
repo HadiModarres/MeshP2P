@@ -1,0 +1,21 @@
+{
+  "name": "cyclon_node_test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify node.js -o bundle.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "angular": "^1.7.8",
+    "browserify": "^16.5.0",
+    "cyclon.p2p": "^0.1.10",
+    "cyclon.p2p-common": "0.0.6",
+    "cyclon.p2p-rtc-client": "^0.1.21",
+    "cyclon.p2p-rtc-comms": "^0.1.23"
+  }
+}
