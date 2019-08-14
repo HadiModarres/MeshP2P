@@ -88,10 +88,22 @@ cyclonNode.start();
 
 // let clientInfoService = new ClientInfoService(persistentStorage);
 let neighbourSet = cyclonNode.getNeighbourSet();
+let currWindow = [];
 cyclonNode.on("neighbours_updated", function () {
     let set = cyclonNode.getNeighbourSet().getContents();
-    document.getElementById("neighbors_previous").innerText = '' + document.getElementById("neighbors_current").innerText;
-    document.getElementById("neighbors_current").innerText = (Object.getOwnPropertyNames(set)).sort().join("\n");
+    document.getElementById("neighbors_previous").innerText = currWindow.sort().join("\n");
+    let newWindow =  (Object.getOwnPropertyNames(set));
+    let taggedWindow = [];
+    for (let id of newWindow){
+        if (currWindow.includes(id)) {
+            taggedWindow.push(id + " *");
+        }else{
+            taggedWindow.push(id);
+        }
+    }
+    currWindow = newWindow;
+    document.getElementById("neighbors_current").innerText = taggedWindow.sort().join("\n");
+    document.getElementById("id").innerText = cyclonNode.getId();
 });
     neighbourSet.on("change", function (change) {
         console.warn("Changed!!: "+change);
