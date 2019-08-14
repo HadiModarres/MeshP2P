@@ -16,6 +16,7 @@
     "cyclon.p2p": "^0.1.10",
     "cyclon.p2p-common": "0.0.6",
     "cyclon.p2p-rtc-client": "^0.1.21",
-    "cyclon.p2p-rtc-comms": "^0.1.23"
+    "cyclon.p2p-rtc-comms": "^0.1.23",
+    "webrtc-adapter": "^7.2.9"
   }
 }

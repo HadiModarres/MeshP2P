@@ -2,7 +2,7 @@ var cyclon = require('cyclon.p2p');
 var cyclonRtc = require('cyclon.p2p-rtc-client');
 var cyclonRtcComms = require('cyclon.p2p-rtc-comms');
 var Utils = require("cyclon.p2p-common");
-
+var ClientInfoService = require("./services/ClientInfoService");
 
 let logger = {
     info : function (message) {
@@ -34,13 +34,7 @@ var DEFAULT_SIGNALLING_SERVERS = [
             "server": "http://localhost:12346"
         },
         "signallingApiBase": "http://localhost:12346"
-    },
-    // {
-    //     "socket": {
-    //         "server": "http://localhost:12347"
-    //     },
-    //     "signallingApiBase": "http://localhost:12347"
-    // }
+    }
 ];
 var DEFAULT_ICE_SERVERS = [
     // The public Google STUN server
@@ -49,13 +43,14 @@ var DEFAULT_ICE_SERVERS = [
 var DEFAULT_CHANNEL_STATE_TIMEOUT_MS = 30000;
 var DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS = 5000;
 
-
+let persistentStorage = sessionStorage;
+let inMemoryStorage = Utils.newInMemoryStorage();
 let timingService = new cyclonRtc.TimingService();
 
 //level 5
 let signallingServerService = new cyclonRtc.StaticSignallingServerService(DEFAULT_SIGNALLING_SERVERS);
 let socketFactory = new cyclonRtc.SocketFactory();
-let signallingServerSelector = new cyclonRtc.SignallingServerSelector(signallingServerService,sessionStorage,timingService,DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS);
+let signallingServerSelector = new cyclonRtc.SignallingServerSelector(signallingServerService,persistentStorage,timingService,DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS);
 
 
 //level4
@@ -65,7 +60,7 @@ let httpRequestService = new cyclonRtc.HttpRequestService();
 
 
 //level3
-let signallingService = new cyclonRtc.SocketIOSignallingService(signallingSocket,logger,httpRequestService,sessionStorage);
+let signallingService = new cyclonRtc.SocketIOSignallingService(signallingSocket,logger,httpRequestService,persistentStorage);
 let peerConnectionFactory = new cyclonRtc.PeerConnectionFactory(rtcObjectFactory,logger,DEFAULT_ICE_SERVERS,DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
 
 
@@ -84,9 +79,50 @@ let bootStrap = new cyclonRtcComms.SignallingServerBootstrap(signallingSocket,ht
 
 
 // level 0
-let cyclonNode = cyclon.builder(comms, bootStrap).build();
+let cyclonNode = cyclon.builder(comms, bootStrap).withNumNeighbours(5).withShuffleSize(5).withStorage(persistentStorage).build();
+
 console.log("starting node");
 cyclonNode.start();
+
+// let clientInfoService = new ClientInfoService(persistentStorage);
+let neighbourSet = cyclonNode.getNeighbourSet();
+cyclonNode.on("neighbours_updated", function () {
+    let set = cyclonNode.getNeighbourSet().getContents();
+    document.getElementById("neighbors_previous").innerText = '' + document.getElementById("neighbors_current").innerText;
+    document.getElementById("neighbors_current").innerText = (Object.getOwnPropertyNames(set)).sort().join("\n");
+});
+    neighbourSet.on("change", function (change) {
+        console.warn("Changed!!: "+change);
+    });
+//
+// setupNeighbourCacheSessionPersistence(neighbourSet);
+//
+// function setupNeighbourCacheSessionPersistence(neighbourSet) {
+//     let storedNeighbourCache = clientInfoService.getStoredNeighbourCache();
+//     if (storedNeighbourCache) {
+//         for (let nodeId in storedNeighbourCache) {
+//             neighbourSet.insert(storedNeighbourCache[nodeId]);
+//         }
+//     }
+//
+//     neighbourSet.on("change", function (change) {
+//         console.warn("Changed!!: "+change);
+//         clientInfoService.setStoredNeighbourCache(neighbourSet.getContents());
+//     });
+// }
+
+global.neighbors = function () {
+    return ;
+    let set = cyclonNode.getNeighbourSet().getContents();
+    let ids = [];
+    // for (let key of set.getOwnPropertyNames()){
+    //     ids.push(key);
+    // }
+    document.getElementById("neighbors").innerText = (Object.getOwnPropertyNames(set)).join("<br>");
+};
+
+
+
 
 
 

@@ -1,9 +1,10 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function (global){
 var cyclon = require('cyclon.p2p');
 var cyclonRtc = require('cyclon.p2p-rtc-client');
 var cyclonRtcComms = require('cyclon.p2p-rtc-comms');
 var Utils = require("cyclon.p2p-common");
-
+var ClientInfoService = require("./services/ClientInfoService");
 
 let logger = {
     info : function (message) {
@@ -35,13 +36,7 @@ var DEFAULT_SIGNALLING_SERVERS = [
             "server": "http://localhost:12346"
         },
         "signallingApiBase": "http://localhost:12346"
-    },
-    // {
-    //     "socket": {
-    //         "server": "http://localhost:12347"
-    //     },
-    //     "signallingApiBase": "http://localhost:12347"
-    // }
+    }
 ];
 var DEFAULT_ICE_SERVERS = [
     // The public Google STUN server
@@ -50,12 +45,14 @@ var DEFAULT_ICE_SERVERS = [
 var DEFAULT_CHANNEL_STATE_TIMEOUT_MS = 30000;
 var DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS = 5000;
 
+let persistentStorage = sessionStorage;
+let inMemoryStorage = Utils.newInMemoryStorage();
 let timingService = new cyclonRtc.TimingService();
 
 //level 5
 let signallingServerService = new cyclonRtc.StaticSignallingServerService(DEFAULT_SIGNALLING_SERVERS);
 let socketFactory = new cyclonRtc.SocketFactory();
-let signallingServerSelector = new cyclonRtc.SignallingServerSelector(signallingServerService,sessionStorage,timingService,DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS);
+let signallingServerSelector = new cyclonRtc.SignallingServerSelector(signallingServerService,persistentStorage,timingService,DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS);
 
 
 //level4
@@ -65,7 +62,7 @@ let httpRequestService = new cyclonRtc.HttpRequestService();
 
 
 //level3
-let signallingService = new cyclonRtc.SocketIOSignallingService(signallingSocket,logger,httpRequestService,sessionStorage);
+let signallingService = new cyclonRtc.SocketIOSignallingService(signallingSocket,logger,httpRequestService,persistentStorage);
 let peerConnectionFactory = new cyclonRtc.PeerConnectionFactory(rtcObjectFactory,logger,DEFAULT_ICE_SERVERS,DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
 
 
@@ -74,9 +71,8 @@ let peerConnectionFactory = new cyclonRtc.PeerConnectionFactory(rtcObjectFactory
 let iceCandidateBatchingSignalling = new cyclonRtc.IceCandidateBatchingSignallingService(Utils.asyncExecService(),
     signallingService,DEFAULT_BATCHING_DELAY_MS);
 let channelFactory = new cyclonRtc.ChannelFactory(peerConnectionFactory,iceCandidateBatchingSignalling,logger);
-
-
 let shuffleStateFactory = new cyclonRtcComms.ShuffleStateFactory(logger, Utils.asyncExecService());
+
 
 // level 1
 let rtc = new cyclonRtc.RTC(iceCandidateBatchingSignalling,channelFactory);
@@ -85,44 +81,62 @@ let bootStrap = new cyclonRtcComms.SignallingServerBootstrap(signallingSocket,ht
 
 
 // level 0
-let cyclonNode = cyclon.builder(comms, bootStrap).build();
+let cyclonNode = cyclon.builder(comms, bootStrap).withNumNeighbours(5).withShuffleSize(5).withStorage(persistentStorage).build();
+
 console.log("starting node");
 cyclonNode.start();
 
-
-
-
-
-
-// // Create the 'cyclon-rtc' module
-// cyclonRtc.buildAngularModule(angular);
-// // Create the 'cyclon-rtc-comms' module
-// cyclonRtcComms.buildAngularModule(angular);
+// let clientInfoService = new ClientInfoService(persistentStorage);
+let neighbourSet = cyclonNode.getNeighbourSet();
+cyclonNode.on("neighbours_updated", function () {
+    let set = cyclonNode.getNeighbourSet().getContents();
+    document.getElementById("neighbors_previous").innerText = '' + document.getElementById("neighbors_current").innerText;
+    document.getElementById("neighbors_current").innerText = (Object.getOwnPropertyNames(set)).sort().join("\n");
+});
+    neighbourSet.on("change", function (change) {
+        console.warn("Changed!!: "+change);
+    });
 //
-// // Then any modules that depend on 'cyclon-rtc-comms' can use the 'Comms' and 'Bootstrap' services exposed
-// var myModule = angular.module('myModule', ['cyclon-rtc-comms'])
-// myModule.service('MyService', ['RTC', 'Comms', 'Bootstrap', function(rtcClient, rtcComms, rtcBootstrap) {
-//     var cyclonNode = cyclon.builder(rtcComms, rtcBootstrap);
-//     console.log("starting node");
-//     cyclonNode.start();
+// setupNeighbourCacheSessionPersistence(neighbourSet);
 //
-//     let t2 = "hellodfs?";
-//     let test = function () {
-//         console.log("string from myservice");
-//     };
+// function setupNeighbourCacheSessionPersistence(neighbourSet) {
+//     let storedNeighbourCache = clientInfoService.getStoredNeighbourCache();
+//     if (storedNeighbourCache) {
+//         for (let nodeId in storedNeighbourCache) {
+//             neighbourSet.insert(storedNeighbourCache[nodeId]);
+//         }
+//     }
 //
-// }]);
-//
-// angular.injector(['ng', 'myModule']).get("MyService").t2;
-// // myModule.controller("Ctrl", ["$scope","MyService", function ($scope,MyService) {
-// //     $scope.testCtrl = "lol??";
-// // }]);
+//     neighbourSet.on("change", function (change) {
+//         console.warn("Changed!!: "+change);
+//         clientInfoService.setStoredNeighbourCache(neighbourSet.getContents());
+//     });
+// }
+
+global.neighbors = function () {
+    return ;
+    let set = cyclonNode.getNeighbourSet().getContents();
+    let ids = [];
+    // for (let key of set.getOwnPropertyNames()){
+    //     ids.push(key);
+    // }
+    document.getElementById("neighbors").innerText = (Object.getOwnPropertyNames(set)).join("<br>");
+};
 
 
 
 
 
-},{"cyclon.p2p":116,"cyclon.p2p-common":88,"cyclon.p2p-rtc-client":103,"cyclon.p2p-rtc-comms":110}],2:[function(require,module,exports){
+
+
+
+
+
+
+
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./services/ClientInfoService":192,"cyclon.p2p":116,"cyclon.p2p-common":88,"cyclon.p2p-rtc-client":103,"cyclon.p2p-rtc-comms":110}],2:[function(require,module,exports){
 module.exports = after
 
 function after(count, callback, err_cb) {
@@ -17038,7 +17052,7 @@ function CyclonNode(neighbours, numNeighbours, bootstrapSize, shuffleSize, comms
         // Choose the oldest neighbour
         //
         var oldestNeighbourId = neighbours.findOldestId();
-
+        console.error("random id: " + oldestNeighbourId);
         //
         // If we have an oldest neighbour, engage them in a shuffle
         //
@@ -17063,16 +17077,19 @@ function CyclonNode(neighbours, numNeighbours, bootstrapSize, shuffleSize, comms
             comms.sendShuffleRequest(outgoingPointer, shuffleSet)
                 .then(function () {
                     myself.emit("shuffleCompleted", "outgoing", outgoingPointer);
-                    logger.info("shuffle completed: " + outgoingPointer);
+                    logger.error("shuffle completed: " + outgoingPointer);
                 })
                 .catch(Utils.UnreachableError, function() {
                     myself.emit("shuffleError", "outgoing", outgoingPointer, "unreachable");
+                    logger.error("shuffle error: " + outgoingPointer);
                 })
                 .catch(Promise.TimeoutError, function (e) {
                     console.warn(e.message);
+                    logger.error("shuffle Timeout: " + outgoingPointer);
                     myself.emit("shuffleTimeout", "outgoing", outgoingPointer);
                 })
                 .catch(Promise.CancellationError, function () {
+                    logger.error("shuffle Timeout: " + outgoingPointer);
                     myself.emit("shuffleTimeout", "outgoing", outgoingPointer);
                 })
                 .catch(function (error) {
@@ -17196,6 +17213,7 @@ function CyclonNode(neighbours, numNeighbours, bootstrapSize, shuffleSize, comms
                 neighbours.insert(item);
             }
         });
+        myself.emit("neighbours_updated");
     }
 
     /**
@@ -17213,6 +17231,8 @@ function CyclonNode(neighbours, numNeighbours, bootstrapSize, shuffleSize, comms
      * from the cache
      */
     function deleteLastShuffleState() {
+        // return ;
+        // if(Object.keys(neighbours).length === numNeighbours)
         neighbours.remove(lastShuffleNodeId);
         lastShuffleNodeId = null;
         lastShuffleSet = [];
@@ -17570,6 +17590,16 @@ function NeighbourSet(logger) {
         return oldestId;
     };
 
+    this.getRandomId = function(){
+
+        let all = Object.getOwnPropertyNames(neighbours);
+        if (all.length===0){
+            return undefined;
+        }
+        let a = all[parseInt(Math.random()*all.length)];
+        console.error("a: " + a);
+        return a;
+    }
     /**
      * Choose a random set of neighbours
      *
@@ -17614,10 +17644,10 @@ module.exports = NeighbourSet;
 },{"cyclon.p2p-common":88,"events":131}],116:[function(require,module,exports){
 'use strict';
 
-var DEFAULT_NUM_NEIGHBOURS = 20;
-var DEFAULT_BOOTSTRAP_SIZE = 1;
-var DEFAULT_SHUFFLE_SIZE = 5;
-var DEFAULT_TICK_INTERVAL_MS = 30000;
+var DEFAULT_NUM_NEIGHBOURS = 10;
+var DEFAULT_BOOTSTRAP_SIZE = 3;
+var DEFAULT_SHUFFLE_SIZE = 8;
+var DEFAULT_TICK_INTERVAL_MS = 10000;
 
 var Utils = require("cyclon.p2p-common");
 
@@ -17699,6 +17729,7 @@ module.exports.LocalBootstrap = LocalBootstrap;
 module.exports.LocalComms = LocalComms;
 module.exports.NeighbourSet = NeighbourSet;
 module.exports.LocalSimulation = LocalSimulation;
+
 },{"./CyclonNode":111,"./LocalBootstrap":112,"./LocalComms":113,"./LocalSimulation":114,"./NeighbourSet":115,"cyclon.p2p-common":88}],117:[function(require,module,exports){
 
 /**
@@ -31177,4 +31208,34 @@ function extend() {
     return target
 }
 
+},{}],192:[function(require,module,exports){
+'use strict';
+
+function ClientInfoService(StorageService) {
+
+    var infoKey = "cyclonDemoClientInfo";
+    var neighbourCacheKey = "cyclonDemoNeighbourCacheKey";
+
+    return {
+
+        getClientInfo: function () {
+            return StorageService.getItem(infoKey);
+        },
+
+        setClientInfo: function (value) {
+            StorageService.setItem(infoKey, value);
+        },
+
+        getStoredNeighbourCache: function() {
+            var storedValue = StorageService.getItem(neighbourCacheKey);
+            return storedValue ? JSON.parse(storedValue) : null;
+        },
+
+        setStoredNeighbourCache: function(value) {
+            StorageService.setItem(neighbourCacheKey, JSON.stringify(value));
+        }
+    };
+}
+
+module.exports = ClientInfoService;
 },{}]},{},[1]);
