@@ -3,6 +3,8 @@ var cyclonRtc = require('cyclon.p2p-rtc-client');
 var cyclonRtcComms = require('cyclon.p2p-rtc-comms');
 var Utils = require("cyclon.p2p-common");
 var ClientInfoService = require("./services/ClientInfoService");
+let ProximityList = require("./proximity/ProximityList");
+let stringSimilarity = require("string-similarity");
 
 let logger = {
     info : function (message) {
@@ -79,16 +81,25 @@ let bootStrap = new cyclonRtcComms.SignallingServerBootstrap(signallingSocket,ht
 
 
 // level 0
-let cyclonNode = cyclon.builder(comms, bootStrap).withNumNeighbours(5).withShuffleSize(5).withStorage(persistentStorage).build();
+let cyclonNode = cyclon.builder(comms, bootStrap)
+    .withNumNeighbours(5)
+    .withMetadataProviders({"clientInfo":{"name":"hadi"}})
+    .withShuffleSize(5)
+    .withStorage(persistentStorage).build();
 
 console.log("starting node");
 cyclonNode.start();
+
+// let proximityList = new ProximityList(5, {index: cyclonNode.getId()}, (a, b) => {
+//     return stringSimilarity.compareTwoStrings(a.id, b.id);
+// });
 
 // let clientInfoService = new ClientInfoService(persistentStorage);
 let neighbourSet = cyclonNode.getNeighbourSet();
 let currWindow = [];
 cyclonNode.on("neighbours_updated", function () {
     let set = cyclonNode.getNeighbourSet().getContents();
+    console.info("neighbors: "+JSON.stringify(set));
     document.getElementById("neighbors_previous").innerText = currWindow.sort().join("\n");
     let newWindow =  (Object.getOwnPropertyNames(set));
     let taggedWindow = [];
