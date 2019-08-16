@@ -5,6 +5,15 @@ var Utils = require("cyclon.p2p-common");
 var ClientInfoService = require("./services/ClientInfoService");
 let ProximityList = require("./proximity/ProximityList");
 let stringSimilarity = require("string-similarity");
+let faker = require("faker");
+
+
+
+
+let name = faker.name.firstName("male");
+let cInfo = function () {
+    return name;
+};
 
 let logger = {
     info : function (message) {
@@ -83,23 +92,45 @@ let bootStrap = new cyclonRtcComms.SignallingServerBootstrap(signallingSocket,ht
 // level 0
 let cyclonNode = cyclon.builder(comms, bootStrap)
     .withNumNeighbours(5)
-    .withMetadataProviders({"clientInfo":{"name":"hadi"}})
+    .withMetadataProviders({
+            "clientInfo": cInfo,
+        }
+    )
     .withShuffleSize(5)
+    .withTickIntervalMs(6000)
     .withStorage(persistentStorage).build();
 
 console.log("starting node");
 cyclonNode.start();
 
+let proximityList = new ProximityList(6, cyclonNode.createNewPointer(), (a, b) => {
+    return stringSimilarity.compareTwoStrings(a["metadata"]["clientInfo"],b["metadata"]["clientInfo"]);
+});
+proximityList.uniqueElements((a, b) => {
+    return a["id"] === b["id"];
+});
+
 // let proximityList = new ProximityList(5, {index: cyclonNode.getId()}, (a, b) => {
 //     return stringSimilarity.compareTwoStrings(a.id, b.id);
 // });
 
+
 // let clientInfoService = new ClientInfoService(persistentStorage);
 let neighbourSet = cyclonNode.getNeighbourSet();
+
 let currWindow = [];
 cyclonNode.on("neighbours_updated", function () {
     let set = cyclonNode.getNeighbourSet().getContents();
-    console.info("neighbors: "+JSON.stringify(set));
+    proximityList.addElements(Object.values(set));
+    let proximityInfo = proximityList.getAllElements().map((value) => {
+        return "name: " + value["metadata"]["clientInfo"];
+    });
+    if (document.getElementById("new_name").value !== ""){
+        name = document.getElementById("new_name").value;
+    }
+    document.getElementById("names").innerText = proximityInfo.join("\n");
+    console.info("proximity list:" + JSON.stringify(proximityInfo));
+    // console.info("neighbors: "+JSON.stringify(Object.values(set)));
     document.getElementById("neighbors_previous").innerText = currWindow.sort().join("\n");
     let newWindow =  (Object.getOwnPropertyNames(set));
     let taggedWindow = [];
@@ -113,6 +144,7 @@ cyclonNode.on("neighbours_updated", function () {
     currWindow = newWindow;
     document.getElementById("neighbors_current").innerText = taggedWindow.sort().join("\n");
     document.getElementById("id").innerText = cyclonNode.getId();
+    document.getElementById("name").innerText = name;
 });
     neighbourSet.on("change", function (change) {
         console.warn("Changed!!: "+change);

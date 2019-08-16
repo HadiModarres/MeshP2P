@@ -1,21 +1,35 @@
-
+let stringSimilarity = require("string-similarity");
 class ProximityList {
     constructor(maximumListSize, referenceElement, proximityFunc) {
         this.list = [];
         this.maximumListSize = maximumListSize;
         this.proximityFunc = proximityFunc;
         this.referenceElement = referenceElement;
+        this.compareFunc = undefined;
+    }
+
+    uniqueElements(compareFunc){
+       this.compareFunc = compareFunc;
     }
 
     /**
      * @return {Boolean} true if list was changed, false if list remained unchanged
      */
     addElement(element){
+        if (this.compareFunc){
+            this._filterList(element);
+        }
         let proximityScore = this.proximityFunc(this.referenceElement, element);
         element.proxmityScore = proximityScore;
         this._putElement(element);
         this.list = this.list.slice(0, this.maximumListSize);
     }
+    _filterList(element){
+        this.list = this.list.filter((value => {
+            return (!this.compareFunc(element,value));
+        }));
+    }
+
     addElements(elements){
         for (let elem of elements) {
             this.addElement(elem);
@@ -58,22 +72,16 @@ let prFunc = (a, b) => {
 
 module.exports = ProximityList;
 
-// let pList = new ProximityList(10, {index: "hadi modarres"}, prFunc);
-// pList.addElement({index:"hadi"});
-// pList.addElement({index:"modarres"});
-// pList.addElement({index:"jeff"});
-// pList.addElement({index:"jeff modarres"});
-// pList.addElement({index:"mary modarres"});
-// pList.addElement({index:"tony bogdanov"});
-// pList.addElement({index:"h. modarres"});
-// pList.addElement({index:"ha modarres"});
-// pList.addElement({index:"t bogdanov"});
-// pList.addElement({index:"jeff modi"});
-// pList.addElement({index:"had modarres"});
-// pList.addElement({index:"hadi modarrres"});
+let pList = new ProximityList(10, {index: "agha hadi"}, prFunc);
+pList.addElement({index:"Justina"});
+pList.addElement({index:"hadi jan"});
+pList.addElement({index:"Chris"});
+pList.addElement({index:"Adelle"});
+pList.addElement({index:"Dortha"});
+pList.addElement({index:"Alfreda"});
 //
 //
-// console.log(pList.getMostSimilarElement());
-// console.log(pList.getAllElements());
-// console.log(pList.getElementCount());
+console.log(pList.getMostSimilarElement());
+console.log(pList.getAllElements());
+console.log(pList.getElementCount());
 
