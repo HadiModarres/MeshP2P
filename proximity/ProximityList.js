@@ -19,8 +19,7 @@ class ProximityList {
         if (this.compareFunc){
             this._filterList(element);
         }
-        let proximityScore = this.proximityFunc(this.referenceElement, element);
-        element.proxmityScore = proximityScore;
+        element.proximityScore = this.proximityFunc(this.referenceElement, element);
         this._putElement(element);
         this.list = this.list.slice(0, this.maximumListSize);
     }
@@ -45,7 +44,7 @@ class ProximityList {
 
     _putElement(element){
         for (let i=0;i<this.list.length;i++){
-            if (this.list[i].proxmityScore<element.proxmityScore){
+            if (this.list[i].proximityScore<element.proximityScore){
                 this.list.splice(i,0,element);
                 return;
             }
@@ -72,13 +71,13 @@ let prFunc = (a, b) => {
 
 module.exports = ProximityList;
 
-let pList = new ProximityList(10, {index: "agha hadi"}, prFunc);
-pList.addElement({index:"Justina"});
-pList.addElement({index:"hadi jan"});
-pList.addElement({index:"Chris"});
-pList.addElement({index:"Adelle"});
-pList.addElement({index:"Dortha"});
-pList.addElement({index:"Alfreda"});
+let pList = new ProximityList(10, {index: "Elouise"}, prFunc);
+pList.addElement({index:"Ben"});
+pList.addElement({index:"Deontae"});
+pList.addElement({index:"Elissa"});
+pList.addElement({index:"Julian"});
+pList.addElement({index:"Antonia"});
+pList.addElement({index:"Elizabeth"});
 //
 //
 console.log(pList.getMostSimilarElement());
