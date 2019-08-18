@@ -6,6 +6,7 @@ var ClientInfoService = require("./services/ClientInfoService");
 let ProximityList = require("./proximity/ProximityList");
 let stringSimilarity = require("string-similarity");
 let faker = require("faker");
+var Promise = require("bluebird");
 
 
 
@@ -103,6 +104,7 @@ let cyclonNode = cyclon.builder(comms, bootStrap)
 console.log("starting node");
 cyclonNode.start();
 
+
 let proximityList = new ProximityList(6, cyclonNode.createNewPointer(), (a, b) => {
     return stringSimilarity.compareTwoStrings(a["metadata"]["clientInfo"],b["metadata"]["clientInfo"]);
 });
@@ -175,6 +177,20 @@ global.neighbors = function () {
     // }
     document.getElementById("neighbors").innerText = (Object.getOwnPropertyNames(set)).join("<br>");
 };
+
+global.runTest = function () {
+    console.info("running test");
+    rtc.openChannel("data", proximityList.getMostSimilarElement()).then((channel) => {
+        console.info(channel);
+        channel.send("data_type", "data!");
+    });
+};
+
+rtc.onChannel("data", function (data) {
+    data.receive("data_type",10000).then((message)=>{
+        console.info(message);
+    });
+});
 
 
 

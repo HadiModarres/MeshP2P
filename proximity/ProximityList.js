@@ -71,13 +71,13 @@ let prFunc = (a, b) => {
 
 module.exports = ProximityList;
 
-let pList = new ProximityList(10, {index: "Elouise"}, prFunc);
-pList.addElement({index:"Ben"});
-pList.addElement({index:"Deontae"});
-pList.addElement({index:"Elissa"});
-pList.addElement({index:"Julian"});
-pList.addElement({index:"Antonia"});
-pList.addElement({index:"Elizabeth"});
+let pList = new ProximityList(10, {index: "Brendon"}, prFunc);
+pList.addElement({index:"Jarrel"});
+pList.addElement({index:"Ramon"});
+pList.addElement({index:"Brendon"});
+pList.addElement({index:"Khalil"});
+pList.addElement({index:"Fae"});
+pList.addElement({index:"Tom"});
 //
 //
 console.log(pList.getMostSimilarElement());
