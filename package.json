@@ -19,6 +19,7 @@
     "cyclon.p2p-rtc-comms": "^0.1.23",
     "faker": "^4.1.0",
     "string-similarity": "^3.0.0",
+    "uuid": "^3.3.3",
     "webrtc-adapter": "^7.2.9"
   }
 }

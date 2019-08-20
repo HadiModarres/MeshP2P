@@ -5,5 +5,6 @@ module.exports.PACKET_TYPE = {
 
 module.exports.PACKET_FIELD = {
    DATE_TIME: "date_time",
-   PACKET_TYPE: "packet_type"
+   PACKET_TYPE: "packet_type",
+   PACKET_ID: "packet_id"
 };
