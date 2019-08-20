@@ -105,6 +105,8 @@ console.log("starting node");
 cyclonNode.start();
 
 
+
+
 let proximityList = new ProximityList(6, cyclonNode.createNewPointer(), (a, b) => {
     return stringSimilarity.compareTwoStrings(a["metadata"]["clientInfo"],b["metadata"]["clientInfo"]);
 });
