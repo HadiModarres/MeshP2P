@@ -13,7 +13,7 @@ class SearchResponder extends NodeController{
         response[constants.PACKET_FIELD.PACKET_ID] = packet[constants.PACKET_FIELD.PACKET_ID];
         response[constants.PACKET_TYPE] = constants.PACKET_TYPE.SEARCH_RES;
         response["content"] = "hello :)";
-        this.sendOutPacket(packet).then((value => {
+        this.sendOutPacket(packet,packet[constants.PACKET_FIELD.PACKET_SOURCE]).then((value => {
             console.info("sent out search response packet");
         }),(reason => {
             console.error("search response send faild:" + reason);

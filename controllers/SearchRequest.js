@@ -27,7 +27,7 @@ class SearchRequest extends NodeController{
          return false;
       if (this.id !== packet[constants.PACKET_FIELD.PACKET_ID])
          return false;
-      console.info("received response for request: " + this.id);
+      console.info("received response for request: " + this.id +" response from: "+packet[constants.PACKET_FIELD.PACKET_SOURCE]);
       return true;
    }
 }
