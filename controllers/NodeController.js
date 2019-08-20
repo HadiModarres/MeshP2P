@@ -17,7 +17,7 @@ class NodeController {
      * @param packet
      * @return {Promise}
      */
-    sendOutPacket(packet){
+    sendOutPacket(packet,targetNode){
         packet["date"] = new Date().getDate();
 
         // todo send packet to node

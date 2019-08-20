@@ -7,15 +7,19 @@ class SearchRequest extends NodeController{
       super(node);
       this.searchTerm = searchTerm;
       this.id = uuid();
+      this.node = node;
    }
 
    initiateSearch(){
+      let neighborIds = this.node.getNeighborIds();
       let packet = {};
       packet[constants.PACKET_FIELD.PACKET_ID] = this.id;
+      packet[constants.PACKET_FIELD.PACKET_SOURCE] = this.node.getId();
       packet[constants.PACKET_FIELD.PACKET_TYPE] = constants.PACKET_TYPE.SEARCH_REQ;
-      this.sendOutPacket(packet).then((value => {
-         console.info("search req sent out");
-      }));
+      packet[constants.PACKET_FIELD.QUERY]= this.searchTerm;
+      for(let neighborId of neighborIds){
+         this.sendOutPacket(packet, neighborId);
+      }
    }
 
    handlePacket(packet){
