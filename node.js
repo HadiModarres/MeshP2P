@@ -1,7 +1,7 @@
 var cyclon = require('cyclon.p2p');
 var cyclonRtc = require('cyclon.p2p-rtc-client');
 var cyclonRtcComms = require('cyclon.p2p-rtc-comms');
-var Utils = require("cyclon.p3p-common");
+var Utils = require("cyclon.p2p-common");
 var ClientInfoService = require("./services/ClientInfoService");
 let ProximityList = require("./proximity/ProximityList");
 let stringSimilarity = require("string-similarity");
@@ -31,6 +31,7 @@ var DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS = 5000;
 
 class Node {
     constructor() {
+        this.header = "N/A";
         this.__initCyclonNode();
         this.__initProximityList();
     }
@@ -44,6 +45,7 @@ class Node {
         });
     }
     __initCyclonNode(){
+        let self = this;
         let persistentStorage = sessionStorage;
         let inMemoryStorage = Utils.newInMemoryStorage();
         let timingService = new cyclonRtc.TimingService();
@@ -83,21 +85,26 @@ class Node {
         this.__cyclonNode = cyclon.builder(comms, bootStrap)
             .withNumNeighbours(5)
             .withMetadataProviders({
-                    "clientInfo": cInfo,
+                    "clientInfo": ()=>{return self.header},
                 }
             )
             .withShuffleSize(5)
-            .withTickIntervalMs(6000)
+            .withTickIntervalMs(10000)
             .withStorage(persistentStorage).build();
-    }
 
-    start(){
+        // this.__cyclonNode.on("neighbours_updated", function () {
+        //     let set = self.__cyclonNode.getNeighbourSet().getContents();
+        //     self.proximityList.addElements(Object.values(set));
+        // });
         console.info("starting node");
         this.__cyclonNode.start();
     }
 
-    setSearchableHeader(header){
+    start(){
+    }
 
+    setSearchableHeader(header){
+       this.header = header;
     }
     setSearchable(bool){
 

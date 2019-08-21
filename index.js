@@ -1,11 +1,11 @@
-let node = require("./node");
+let Node = require("./node");
 let faker = require("faker");
 
 
-let name = faker.name.firstName("male");
-let cInfo = function () {
-    return name;
-};
+// let name = faker.name.firstName("male");
+// let cInfo = function () {
+//     return name;
+// };
 
 let logger = {
     info : function (message) {
@@ -24,24 +24,22 @@ let logger = {
 
 
 
-
-
-
-
-
-// let proximityList = new ProximityList(5, {index: cyclonNode.getId()}, (a, b) => {
+// let proximityList = new ProximityList(5, {index: node.getId()}, (a, b) => {
 //     return stringSimilarity.compareTwoStrings(a.id, b.id);
 // });
 
+let node = new Node();
+node.setSearchableHeader(faker.name.firstName());
+node.start();
 
 // let clientInfoService = new ClientInfoService(persistentStorage);
-let neighbourSet = cyclonNode.getNeighbourSet();
+let neighbourSet = node.__cyclonNode.getNeighbourSet();
 
 let currWindow = [];
-cyclonNode.on("neighbours_updated", function () {
-    let set = cyclonNode.getNeighbourSet().getContents();
-    proximityList.addElements(Object.values(set));
-    let proximityInfo = proximityList.getAllElements().map((value) => {
+node.__cyclonNode.on("neighbours_updated", function () {
+    let set = node.__cyclonNode.getNeighbourSet().getContents();
+    node.proximityList.addElements(Object.values(set));
+    let proximityInfo = node.proximityList.getAllElements().map((value) => {
         return "name: " + value["metadata"]["clientInfo"];
     });
     if (document.getElementById("new_name").value !== ""){
@@ -62,8 +60,8 @@ cyclonNode.on("neighbours_updated", function () {
     }
     currWindow = newWindow;
     document.getElementById("neighbors_current").innerText = taggedWindow.sort().join("\n");
-    document.getElementById("id").innerText = cyclonNode.getId();
-    document.getElementById("name").innerText = name;
+    document.getElementById("id").innerText = node.__cyclonNode.getId();
+    document.getElementById("name").innerText = node.header;
 });
 neighbourSet.on("change", function (change) {
     console.warn("Changed!!: "+change);
@@ -85,29 +83,29 @@ neighbourSet.on("change", function (change) {
 //     });
 // }
 
-global.neighbors = function () {
-    return ;
-    let set = cyclonNode.getNeighbourSet().getContents();
-    let ids = [];
-    // for (let key of set.getOwnPropertyNames()){
-    //     ids.push(key);
-    // }
-    document.getElementById("neighbors").innerText = (Object.getOwnPropertyNames(set)).join("<br>");
-};
-
-global.runTest = function () {
-    console.info("running test");
-    rtc.openChannel("data", proximityList.getMostSimilarElement()).then((channel) => {
-        console.info(channel);
-        channel.send("data_type", "data!");
-    });
-};
-
-rtc.onChannel("data", function (data) {
-    data.receive("data_type",10000).then((message)=>{
-        console.info(message);
-    });
-});
+// global.neighbors = function () {
+//     return ;
+//     let set = node.getNeighbourSet().getContents();
+//     let ids = [];
+//     // for (let key of set.getOwnPropertyNames()){
+//     //     ids.push(key);
+//     // }
+//     document.getElementById("neighbors").innerText = (Object.getOwnPropertyNames(set)).join("<br>");
+// };
+//
+// global.runTest = function () {
+//     console.info("running test");
+//     rtc.openChannel("data", proximityList.getMostSimilarElement()).then((channel) => {
+//         console.info(channel);
+//         channel.send("data_type", "data!");
+//     });
+// };
+//
+// rtc.onChannel("data", function (data) {
+//     data.receive("data_type",10000).then((message)=>{
+//         console.info(message);
+//     });
+// });
 
 
 
