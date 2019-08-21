@@ -30,7 +30,6 @@ let logger = {
 
 let node = new Node();
 node.setSearchableHeader(faker.name.firstName());
-node.start();
 
 // let clientInfoService = new ClientInfoService(persistentStorage);
 let neighbourSet = node.__cyclonNode.getNeighbourSet();
@@ -43,7 +42,7 @@ node.__cyclonNode.on("neighbours_updated", function () {
         return "name: " + value["metadata"]["clientInfo"];
     });
     if (document.getElementById("new_name").value !== ""){
-        name = document.getElementById("new_name").value;
+        node.setSearchableHeader(document.getElementById("new_name").value);
     }
     document.getElementById("names").innerText = proximityInfo.join("\n");
     console.info("proximity list:" + JSON.stringify(proximityInfo));
@@ -63,9 +62,9 @@ node.__cyclonNode.on("neighbours_updated", function () {
     document.getElementById("id").innerText = node.__cyclonNode.getId();
     document.getElementById("name").innerText = node.header;
 });
-neighbourSet.on("change", function (change) {
-    console.warn("Changed!!: "+change);
-});
+// neighbourSet.on("change", function (change) {
+//     console.warn("Changed!!: "+change);
+// });
 //
 // setupNeighbourCacheSessionPersistence(neighbourSet);
 //

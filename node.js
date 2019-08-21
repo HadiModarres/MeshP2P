@@ -100,8 +100,6 @@ class Node {
         this.__cyclonNode.start();
     }
 
-    start(){
-    }
 
     setSearchableHeader(header){
        this.header = header;
