@@ -1,5 +1,6 @@
 let Node = require("./node");
 let faker = require("faker");
+let SearchRequest = require("./controllers/SearchRequest");
 
 
 // let name = faker.name.firstName("male");
@@ -92,13 +93,16 @@ node.__cyclonNode.on("neighbours_updated", function () {
 //     document.getElementById("neighbors").innerText = (Object.getOwnPropertyNames(set)).join("<br>");
 // };
 //
-// global.runTest = function () {
-//     console.info("running test");
-//     rtc.openChannel("data", proximityList.getMostSimilarElement()).then((channel) => {
-//         console.info(channel);
-//         channel.send("data_type", "data!");
-//     });
-// };
+global.runTest = function () {
+    console.info("running test");
+    // rtc.openChannel("data", proximityList.getMostSimilarElement()).then((channel) => {
+    //     console.info(channel);
+    //     channel.send("data_type", "data!");
+    // });
+    let searchRequest = new SearchRequest(node, "Sample Search Term");
+    node.attachController(searchRequest);
+    searchRequest.initiateSearch();
+};
 //
 // rtc.onChannel("data", function (data) {
 //     data.receive("data_type",10000).then((message)=>{

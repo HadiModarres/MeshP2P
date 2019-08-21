@@ -31,3 +31,5 @@ class SearchRequest extends NodeController{
       return true;
    }
 }
+
+module.exports = SearchRequest;

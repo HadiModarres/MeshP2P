@@ -21,3 +21,5 @@ class SearchResponder extends NodeController{
         return true;
     }
 }
+
+module.exports = SearchResponder;

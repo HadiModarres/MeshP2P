@@ -19,8 +19,7 @@ class NodeController {
      */
     sendOutPacket(packet,targetNode){
         packet["date"] = new Date().getDate();
-
-        // todo send packet to node
+        this.node.sendObjectToNode(packet, targetNode);
     }
 
 
