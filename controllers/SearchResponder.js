@@ -6,6 +6,7 @@ class SearchResponder extends NodeController{
         super(node);
     }
     handlePacket(packet){
+        console.info("search responder: handing packet");
         if (packet[constants.PACKET_FIELD.PACKET_TYPE] !== constants.PACKET_TYPE.SEARCH_REQ) {
             return false;
         }

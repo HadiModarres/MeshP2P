@@ -173,8 +173,13 @@ class Node {
 
         }
 
+        getNeighbourIds(){
+            return this.proximityList.getAllElements().map((value) => {
+                return value.id;
+            });
+        }
+
+
     }
 
-    module
-.
-    exports = Node;
+module.exports = Node;
