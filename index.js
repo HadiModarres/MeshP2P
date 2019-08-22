@@ -49,7 +49,7 @@ node.__cyclonNode.on("neighbours_updated", function () {
         return "name: " + value["metadata"]["clientInfo"];
     });
     if (document.getElementById("new_name").value !== ""){
-        node.setSearchableHeader(document.getElementById("new_name").value);
+        // node.setSearchableHeader(document.getElementById("new_name").value);
     }
     document.getElementById("names").innerText = proximityInfo.join("\n");
     console.info("proximity list:" + JSON.stringify(proximityInfo));
@@ -105,7 +105,7 @@ global.runTest = function () {
     //     console.info(channel);
     //     channel.send("data_type", "data!");
     // });
-    let searchRequest = new SearchRequest(node, "Sample Search Term");
+    let searchRequest = new SearchRequest(node, document.getElementById("new_name").value);
     node.attachController(searchRequest);
     searchRequest.initiateSearch();
 };

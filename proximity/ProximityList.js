@@ -19,6 +19,9 @@ class ProximityList {
     }
 
     perfectMatchForElement(element){
+        if (this.proximityFunc(this.referenceElement,element)===1){
+            return this.referenceElement;
+        }
         for (let e of this.list) {
             if (this.proximityFunc(e,element)===1){
                 return e;

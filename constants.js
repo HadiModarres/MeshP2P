@@ -9,7 +9,6 @@ module.exports.PACKET_FIELD = {
    PACKET_ID: "packet_id",
    PACKET_SOURCE: "packet_source",
    QUERY: "query",
-   REQUEST_ID: "request_id",
    HOPS: "hops",
    BODY:"body"
 };

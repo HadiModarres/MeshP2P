@@ -8,6 +8,7 @@ class SearchRelay extends NodeController{
         this.maximumHops = 4;
     }
     handlePacket(packet){
+        console.info("testing relay");
         if (packet[constants.PACKET_FIELD.PACKET_TYPE] !== constants.PACKET_TYPE.SEARCH_REQ) {
             return false;
         }

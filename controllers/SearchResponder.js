@@ -7,6 +7,7 @@ class SearchResponder extends NodeController{
         this.handledPacketIds = [];
     }
     handlePacket(packet){
+        console.info("testing responder");
         if (packet[constants.PACKET_FIELD.PACKET_TYPE] !== constants.PACKET_TYPE.SEARCH_REQ) {
             return false;
         }
@@ -46,9 +47,9 @@ class SearchResponder extends NodeController{
         console.info("search responder: handling packet");
         let response = {};
         response[constants.PACKET_FIELD.PACKET_ID] = packet[constants.PACKET_FIELD.PACKET_ID];
-        response[constants.PACKET_TYPE] = constants.PACKET_TYPE.SEARCH_RES;
+        response[constants.PACKET_FIELD.PACKET_TYPE] = constants.PACKET_TYPE.SEARCH_RES;
         response[constants.PACKET_FIELD.BODY] = responseBody;
-        this.sendOutPacket(packet,packet[constants.PACKET_FIELD.PACKET_SOURCE]).then((value => {
+        this.sendOutPacket(response,packet[constants.PACKET_FIELD.PACKET_SOURCE]).then((value => {
             console.info("sent out search response packet");
         }),(reason => {
             console.error("search response send faild:" + reason);

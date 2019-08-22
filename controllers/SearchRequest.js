@@ -11,9 +11,9 @@ class SearchRequest extends NodeController{
    }
 
    initiateSearch(){
-      let neighborIds = this.node.getNeighbourIds();
+      let neighborIds = this.node.getRandomSamplePointers();
       let packet = {};
-      packet[constants.PACKET_FIELD.REQUEST_ID] = this.id;
+      packet[constants.PACKET_FIELD.PACKET_ID] = this.id;
       packet[constants.PACKET_FIELD.PACKET_SOURCE] = this.node.__cyclonNode.createNewPointer();
       packet[constants.PACKET_FIELD.PACKET_TYPE] = constants.PACKET_TYPE.SEARCH_REQ;
       packet[constants.PACKET_FIELD.HOPS] = 1;

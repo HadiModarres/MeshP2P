@@ -8,6 +8,7 @@ let stringSimilarity = require("string-similarity");
 var Promise = require("bluebird");
 let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
+let SearchRelay = require("./controllers/SearchRelay");
 
 var DEFAULT_BATCHING_DELAY_MS = 300;
 var DEFAULT_SIGNALLING_SERVERS = [
@@ -43,6 +44,8 @@ class Node {
     __initSearchControllers() {
         let searchResponder = new SearchResponder(this);
         this.attachController(searchResponder);
+        let searchRelay = new SearchRelay(this);
+        this.attachController(searchRelay);
     }
 
     __initProximityList() {
@@ -134,11 +137,11 @@ class Node {
      * @param obj
      * @param {uuid} targetNodeId
      */
-    sendObjectToNode(obj, targetNodeId) {
-        let targetPointer = this.__getNodePointerForNodeUUID(targetNodeId);
-        if (!targetPointer)
-            throw new Error(`pointer with id ${targetNodeId} doesnt exist`);
-        this.rtc.openChannel("search", targetPointer).then((channel) => {
+    sendObjectToNode(obj, targetNodePointer) {
+        // let targetPointer = this.__getNodePointerForNodeUUID(targetNodeId);
+        // if (!targetPointer)
+        //     throw new Error(`pointer with id ${targetNodeId} doesnt exist`);
+        this.rtc.openChannel("search", targetNodePointer).then((channel) => {
             // console.info(channel);
                 channel.send("unionp2p", {
                     data: obj
@@ -152,11 +155,13 @@ class Node {
                 return pointer;
             }
         }
+        console.info(id);
         return undefined;
     }
 
     setSearchableHeader(header) {
         this.header = header;
+        this.__initProximityList();
     }
 
     setSearchable(bool) {
@@ -175,11 +180,22 @@ class Node {
 
     }
 
-    getNeighbourIds() {
-        // return this.proximityList.getAllElements().map((value) => {
-        //     return value.id;
-        // });
-        return this.__cyclonNode.getNeighbourSet().getContents();
+    getProximityIds() {
+        return this.proximityList.getAllElements().map((value) => {
+            return value.id;
+        });
+    }
+    getProximityPointers(){
+        return this.proximityList.getAllElements();
+    }
+
+    getRandomSamplePointers(){
+        return Object.values(this.__cyclonNode.getNeighbourSet().getContents());
+    }
+    getRandomSampleIds(){
+        return Object.values(this.__cyclonNode.getNeighbourSet().getContents()).map((value => {
+            return value.id;
+        }));
     }
 
     getId() {
