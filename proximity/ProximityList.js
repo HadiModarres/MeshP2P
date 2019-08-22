@@ -1,5 +1,11 @@
 let stringSimilarity = require("string-similarity");
 class ProximityList {
+    /**
+     *
+     * @param maximumListSize
+     * @param referenceElement
+     * @param proximityFunc (a,b) => float n,  0<n<1
+     */
     constructor(maximumListSize, referenceElement, proximityFunc) {
         this.list = [];
         this.maximumListSize = maximumListSize;
@@ -12,6 +18,14 @@ class ProximityList {
        this.compareFunc = compareFunc;
     }
 
+    perfectMatchForElement(element){
+        for (let e of this.list) {
+            if (this.proximityFunc(e,element)===1){
+                return e;
+            }
+        }
+        return undefined;
+    }
     /**
      * @return {Boolean} true if list was changed, false if list remained unchanged
      */
@@ -65,22 +79,22 @@ class ProximityList {
 }
 
 
-let prFunc = (a, b) => {
-    return stringSimilarity.compareTwoStrings(a.index, b.index);
-};
+// let prFunc = (a, b) => {
+//     return stringSimilarity.compareTwoStrings(a.index, b.index);
+// };
+
+
+// let pList = new ProximityList(10, {index: "Brendon"}, prFunc);
+// pList.addElement({index:"Jarrel"});
+// pList.addElement({index:"Ramon"});
+// pList.addElement({index:"Brendon"});
+// pList.addElement({index:"Khalil"});
+// pList.addElement({index:"Fae"});
+// pList.addElement({index:"Tom"});
+// //
+// //
+// console.log(pList.getMostSimilarElement());
+// console.log(pList.getAllElements());
+// console.log(pList.getElementCount());
 
 module.exports = ProximityList;
-
-let pList = new ProximityList(10, {index: "Brendon"}, prFunc);
-pList.addElement({index:"Jarrel"});
-pList.addElement({index:"Ramon"});
-pList.addElement({index:"Brendon"});
-pList.addElement({index:"Khalil"});
-pList.addElement({index:"Fae"});
-pList.addElement({index:"Tom"});
-//
-//
-console.log(pList.getMostSimilarElement());
-console.log(pList.getAllElements());
-console.log(pList.getElementCount());
-

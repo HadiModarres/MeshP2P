@@ -8,5 +8,8 @@ module.exports.PACKET_FIELD = {
    PACKET_TYPE: "packet_type",
    PACKET_ID: "packet_id",
    PACKET_SOURCE: "packet_source",
-   QUERY: "query"
+   QUERY: "query",
+   REQUEST_ID: "request_id",
+   HOPS: "hops",
+   BODY:"body"
 };

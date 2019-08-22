@@ -10,6 +10,7 @@ class NodeController {
      */
     handlePacket(packet){
         // override in subclass
+        throw new Error("should handle in subclass");
     }
 
     /**

@@ -1,6 +1,7 @@
 let Node = require("./node");
 let faker = require("faker");
 let SearchRequest = require("./controllers/SearchRequest");
+let SearchResponder = require("./controllers/SearchResponder");
 
 
 // let name = faker.name.firstName("male");
@@ -35,7 +36,12 @@ node.setSearchableHeader(faker.name.firstName());
 // let clientInfoService = new ClientInfoService(persistentStorage);
 let neighbourSet = node.__cyclonNode.getNeighbourSet();
 
+// let searchResponder = new SearchResponder(node);
+// node.attachController(searchResponder);
+
+
 let currWindow = [];
+
 node.__cyclonNode.on("neighbours_updated", function () {
     let set = node.__cyclonNode.getNeighbourSet().getContents();
     node.proximityList.addElements(Object.values(set));

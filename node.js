@@ -34,10 +34,10 @@ var DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS = 5000;
 class Node {
     constructor() {
         this.header = "N/A";
+        this.__controllers = [];
         this.__initCyclonNode();
         this.__initProximityList();
         this.__initSearchControllers();
-        this.__controllers = [];
     }
 
     __initSearchControllers() {
@@ -100,7 +100,7 @@ class Node {
                 }
             )
             .withShuffleSize(5)
-            .withTickIntervalMs(10000)
+            .withTickIntervalMs(20000)
             .withStorage(persistentStorage).build();
 
         // this.__cyclonNode.on("neighbours_updated", function () {
@@ -111,75 +111,82 @@ class Node {
         this.__cyclonNode.start();
 
 
-        this.rtc.onChannel("data", function (data) {
-            data.receive("data_type", 10000).then((message) => {
+        this.rtc.onChannel("search", function (data) {
+            data.receive("unionp2p", 30000).then((message) => {
+                console.info("data received!");
                 console.info(message);
-                self.__handleReceivedPacket(JSON.parse(message));
+                self.__handleReceivedPacket(message.data);
             });
         });
     }
 
-        __handleReceivedPacket(packet){
-            for (let controller of this.__controllers) {
-                if (controller.handlePacket(packet))
-                    return;
+    __handleReceivedPacket(packet) {
+        console.log(this.__controllers.length);
+        for (let controller of this.__controllers) {
+            console.info("testing controller");
+            if (controller.handlePacket(packet))
+                return;
+        }
+    }
+
+    /**
+     *
+     * @param obj
+     * @param {uuid} targetNodeId
+     */
+    sendObjectToNode(obj, targetNodeId) {
+        let targetPointer = this.__getNodePointerForNodeUUID(targetNodeId);
+        if (!targetPointer)
+            throw new Error(`pointer with id ${targetNodeId} doesnt exist`);
+        this.rtc.openChannel("search", targetPointer).then((channel) => {
+            // console.info(channel);
+                channel.send("unionp2p", {
+                    data: obj
+                });
+        });
+    }
+
+    __getNodePointerForNodeUUID(id) {
+        for (let pointer of this.proximityList.getAllElements()) {
+            if (pointer["id"] === id) {
+                return pointer;
             }
         }
-        /**
-         *
-         * @param obj
-         * @param {uuid} targetNodeId
-         */
-        sendObjectToNode(obj, targetNodeId)
-        {
-            let targetPointer = this.__getNodePointerForNodeUUID(targetNodeId);
-            if (!targetPointer)
-                throw new Error(`pointer with id ${targetNodeId} doesnt exist`);
-            this.rtc.openChannel("data", targetPointer).then((channel) => {
-                console.info(channel);
-                channel.send("data_type", JSON.stringify(obj));
-            });
-        }
+        return undefined;
+    }
 
-        __getNodePointerForNodeUUID(id)
-        {
-            for (let pointer of this.proximityList) {
-                if (pointer["id"] === id) {
-                    return pointer;
-                }
+    setSearchableHeader(header) {
+        this.header = header;
+    }
 
-            }
-            return undefined;
-        }
-        setSearchableHeader(header)
-        {
-            this.header = header;
-        }
-        setSearchable(bool)
-        {
-
-        }
-
-        attachController(controller)
-        {
-
-        }
-        detachController(controller)
-        {
-
-        }
-        getController(type)
-        {
-
-        }
-
-        getNeighbourIds(){
-            return this.proximityList.getAllElements().map((value) => {
-                return value.id;
-            });
-        }
-
+    setSearchable(bool) {
 
     }
+
+    attachController(controller) {
+        this.__controllers.push(controller);
+    }
+
+    detachController(controller) {
+
+    }
+
+    getController(type) {
+
+    }
+
+    getNeighbourIds() {
+        // return this.proximityList.getAllElements().map((value) => {
+        //     return value.id;
+        // });
+        return this.__cyclonNode.getNeighbourSet().getContents();
+    }
+
+    getId() {
+        return this.__cyclonNode.getId();
+    }
+
+
+}
 
 module.exports = Node;
