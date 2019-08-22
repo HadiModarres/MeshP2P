@@ -26,6 +26,22 @@ class ProximityList {
         }
         return undefined;
     }
+
+    NearestNodesTo(element,count){
+        let ind=-1;
+        let score = this.proximityFunc(this.referenceElement, element);
+        for (let i=0;i<this.list.length;i++){
+            if (score>this.list[i].proximityScore){
+                ind = i;
+            }
+        }
+        if (ind===-1){
+            return [];
+        }else{
+            return this.list.slice(ind - (count / 2), count);
+        }
+    }
+
     /**
      * @return {Boolean} true if list was changed, false if list remained unchanged
      */

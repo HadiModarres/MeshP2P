@@ -20,11 +20,22 @@ class SearchRelay extends NodeController{
             this.handledPacketIds.push(packet[constants.PACKET_FIELD.PACKET_ID]);
         }
         packet[constants.PACKET_FIELD.HOPS] ++;
-        let n = Math.pow(2,(this.maximumHops-packet[constants.PACKET_FIELD.HOPS])) -1
-        if (n===0){
+        let n = Math.pow(2, (this.maximumHops - packet[constants.PACKET_FIELD.HOPS])) ;
+        if (n===1){
             return false;
         }else {
-
+            let elem = {
+                "metadata": {
+                    "clientInfo": packet[constants.PACKET_FIELD.QUERY]
+                }};
+            let nearNodes = this.node.proximityList.NearestNodesTo(elem, n);
+            for (let node of nearNodes) {
+                this.sendOutPacket(packet, node).then((value => {
+                    console.info("relayed search request");
+                }),(reason => {
+                    console.info("couldnt relay request");
+                }));
+            }
         }
     }
 }
