@@ -24,7 +24,7 @@ class SearchRelay extends NodeController{
         if (n===0){
             return false;
         }else {
-            
+
         }
     }
 }
