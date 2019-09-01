@@ -70,7 +70,8 @@ class Node {
 
 
 //level4
-        let rtcObjectFactory = new cyclonRtc.AdapterJsRTCObjectFactory(console);
+//         let rtcObjectFactory = new cyclonRtc.AdapterJsRTCObjectFactory(console);
+        let rtcObjectFactory = new cyclonRtc.NativeRTCObjectFactory(console);
         let signallingSocket = new cyclonRtc.RedundantSignallingSocket(signallingServerService, socketFactory, console, Utils.asyncExecService(), signallingServerSelector);
         let httpRequestService = new cyclonRtc.HttpRequestService();
 
