@@ -1,5 +1,6 @@
 const NodeController = require("./NodeController");
 const constants = require("../constants");
+var cyclonRtc = require('cyclon.p2p-rtc-client');
 
 class SearchRelay extends NodeController{
     constructor(node){
@@ -30,6 +31,8 @@ class SearchRelay extends NodeController{
                     "clientInfo": packet[constants.PACKET_FIELD.QUERY]
                 }};
             let nearNodes = this.node.proximityList.NearestNodesTo(elem, n);
+            let httpReq = new cyclonRtc.HttpRequestService();
+            httpReq.get(`http://localhost:3000/stats/search_relayed?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
             for (let node of nearNodes) {
                 this.sendOutPacket(packet, node).then((value => {
                     console.info("relayed search request");

@@ -1,6 +1,8 @@
 const NodeController = require("./NodeController");
 const constants = require("../constants");
 const uuid = require("uuid/v4");
+var cyclonRtc = require('cyclon.p2p-rtc-client');
+
 
 class SearchRequest extends NodeController{
    constructor(node,searchTerm){
@@ -20,6 +22,8 @@ class SearchRequest extends NodeController{
       packet[constants.PACKET_FIELD.QUERY]= this.searchTerm;
       for(let neighborId of neighborIds) {
          this.sendOutPacket(packet, neighborId);
+         let httpReq = new cyclonRtc.HttpRequestService();
+         httpReq.get(`http://localhost:3000/stats/search_started?id=${this.id}&source_id=${this.node.__cyclonNode.getId()}&query=${this.searchTerm}`);
       }
    }
 

@@ -31,7 +31,11 @@ let logger = {
 // });
 
 let node = new Node();
-node.setSearchableHeader(faker.name.firstName());
+let name = faker.name.firstName();
+while (name.charAt(0) !== 'K') {
+    name = faker.name.firstName();
+}
+node.setSearchableHeader(name);
 
 // let clientInfoService = new ClientInfoService(persistentStorage);
 let neighbourSet = node.__cyclonNode.getNeighbourSet();

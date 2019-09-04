@@ -9,6 +9,7 @@ var Promise = require("bluebird");
 let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
 let SearchRelay = require("./controllers/SearchRelay");
+const constants = require("./constants");
 
 var DEFAULT_BATCHING_DELAY_MS = 300;
 var DEFAULT_SIGNALLING_SERVERS = [
@@ -41,6 +42,7 @@ class Node {
         this.__initSearchControllers();
     }
 
+
     __initSearchControllers() {
         let searchResponder = new SearchResponder(this);
         this.attachController(searchResponder);
@@ -56,6 +58,8 @@ class Node {
             return a["id"] === b["id"];
         });
     }
+
+
 
     __initCyclonNode() {
         let self = this;
@@ -145,6 +149,8 @@ class Node {
             if (controller.handlePacket(packet))
                 return;
         }
+        let httpReq = new cyclonRtc.HttpRequestService();
+        httpReq.get(`http://localhost:3000/stats/search_discarded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
     }
 
     /**
@@ -166,19 +172,6 @@ class Node {
     }
 
 
-    /**
-     *
-     * @param targetNodePointer
-     * @returns {Promise}
-     */
-    connectToNode(targetNodePointer){
-        let promise = new Promise(function (resolve, reject) {
-            this.rtc.openChannel("unionp2p", targetNodePointer).then((channel) => {
-                // console.info(channel);
-                resolve(channel.rtcDataChannel);
-            });
-        });
-    }
 
     __getNodePointerForNodeUUID(id) {
         for (let pointer of this.proximityList.getAllElements()) {

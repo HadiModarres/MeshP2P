@@ -1,4 +1,5 @@
 const NodeController = require("./NodeController");
+var cyclonRtc = require('cyclon.p2p-rtc-client');
 const constants = require("../constants");
 
 class SearchResponder extends NodeController{
@@ -12,6 +13,8 @@ class SearchResponder extends NodeController{
             return false;
         }
         if (this.handledPacketIds.includes(packet[constants.PACKET_FIELD.PACKET_ID])) {
+            let httpReq = new cyclonRtc.HttpRequestService();
+            httpReq.get(`http://localhost:3000/stats/search_revisited?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
             return false;
         }else{
             if (this.handledPacketIds.length>200){
@@ -27,6 +30,8 @@ class SearchResponder extends NodeController{
 
         this.__sendResponseFor(packet,response);
 
+        let httpReq = new cyclonRtc.HttpRequestService();
+        httpReq.get(`http://localhost:3000/stats/search_responded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
         return true;
     }
 
