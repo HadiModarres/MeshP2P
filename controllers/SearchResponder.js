@@ -49,12 +49,9 @@ class SearchResponder extends NodeController{
         response[constants.PACKET_FIELD.PACKET_ID] = packet[constants.PACKET_FIELD.PACKET_ID];
         response[constants.PACKET_FIELD.PACKET_TYPE] = constants.PACKET_TYPE.SEARCH_RES;
         response[constants.PACKET_FIELD.BODY] = responseBody;
-        this.sendOutPacket(response,packet[constants.PACKET_FIELD.PACKET_SOURCE]).then((value => {
-            console.info("sent out search response packet");
-        }),(reason => {
-            console.error("search response send faild:" + reason);
-        }));
+        this.node.sendObjectToNode(response,packet[constants.PACKET_FIELD.PACKET_SOURCE]);
     }
 }
+
 
 module.exports = SearchResponder;

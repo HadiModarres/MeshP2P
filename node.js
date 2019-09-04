@@ -115,11 +115,25 @@ class Node {
         this.__cyclonNode.start();
 
 
+        this.__listenForPackets();
+        // this.rtc.onChannel("search", function (data) {
+        //     data.receive("unionp2p", 30000).then((message) => {
+        //         console.info("data received!");
+        //         console.info(message);
+        //         self.__handleReceivedPacket(message.data);
+        //     });
+        // });
+    }
+
+    __listenForPackets(){
+        let self =this;
         this.rtc.onChannel("search", function (data) {
             data.receive("unionp2p", 30000).then((message) => {
                 console.info("data received!");
                 console.info(message);
                 self.__handleReceivedPacket(message.data);
+                data.close();
+                self.__listenForPackets();
             });
         });
     }
@@ -144,9 +158,25 @@ class Node {
         //     throw new Error(`pointer with id ${targetNodeId} doesnt exist`);
         this.rtc.openChannel("search", targetNodePointer).then((channel) => {
             // console.info(channel);
+            console.error("before send");
                 channel.send("unionp2p", {
                     data: obj
                 });
+        });
+    }
+
+
+    /**
+     *
+     * @param targetNodePointer
+     * @returns {Promise}
+     */
+    connectToNode(targetNodePointer){
+        let promise = new Promise(function (resolve, reject) {
+            this.rtc.openChannel("unionp2p", targetNodePointer).then((channel) => {
+                // console.info(channel);
+                resolve(channel.rtcDataChannel);
+            });
         });
     }
 
