@@ -38,10 +38,48 @@ class Node {
         this.header = "N/A";
         this.__controllers = [];
         this.__initCyclonNode();
-        this.__initProximityList();
-        this.__initSearchControllers();
+        // this.__initProximityList();
+        // this.__initSearchControllers();
     }
 
+    /**
+     * Register a global list on this node
+     * @param list
+     * @param proximityFunction (a,b)->float 0 to 1, 1 being identical and 0 least similar
+     *
+     */
+    registerList(list,proximityFunction){
+
+    }
+
+    /**
+     * Set the entries for the global list
+     * @param list
+     * @param entries
+     */
+    setEntries(list,entries){
+
+    }
+
+    /**
+     * Search the global list <list> for the object <query>, searchResultCallback is called with the corresponding result
+     * every time a response is received.
+     *
+     * @param list
+     * @param query
+     * @param searchResultCallback
+     */
+    search(list,query,searchResultCallback){
+
+    }
+
+    /**
+     * Connects to the node determined by nodePointer and returns an rtc data channel
+     * @param nodePointer
+     */
+    connectToNode(nodePointer){
+
+    }
 
     __initSearchControllers() {
         let searchResponder = new SearchResponder(this);
