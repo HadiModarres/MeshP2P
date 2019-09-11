@@ -1,5 +1,8 @@
 let ProximityList = require("./ProximityList");
 
+/**
+ * List manager works with entries of type {key,value}
+ */
 class ListManager {
     constructor() {
         this.proximityListSize = 5;
@@ -18,7 +21,9 @@ class ListManager {
     }
 
     removeAllEntries() {
-
+        for (let l of this.lists){
+            l.lists=[];
+        }
     }
 
     /**
@@ -36,13 +41,23 @@ class ListManager {
     }
 
 
+    removeEntry(globalList,entry){
+        let list = this.getGlobalList(globalList);
+        if (!list){
+            console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
+            return;
+        }
+        list.lists = list.lists.filter((value) => {
+           return (value.key !== entry.key);
+        });
+    }
     addEntry(globalList, entry) {
         let list = this.getGlobalList(globalList);
         if (!list) {
             console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
         } else {
             for (let l of list.lists){
-                if (l.referenceElement === entry){
+                if (l.referenceElement.key === entry.key){
                     console.warn(`a proximity list for entry ${entry} already exists.`);
                     return;
                 }
@@ -52,12 +67,24 @@ class ListManager {
         }
     }
 
-    addNeighbor(list, neighbor) {
-        
+    addNeighbor(globalList, neighbor) {
+        let list = this.getGlobalList(globalList);
+        if (!list) {
+            console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
+            return undefined;
+        }
+        for (let l of list.lists){
+            l.addElement(neighbor);
+        }
     }
 
     getAllProximityLists(globalList) {
-
+        let list = this.getGlobalList(globalList);
+        if (!list) {
+            console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
+            return undefined;
+        }
+        return list.lists;
     }
 
 }
