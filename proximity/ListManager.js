@@ -67,16 +67,32 @@ class ListManager {
         }
     }
 
-    addNeighbor(globalList, neighbor) {
-        let list = this.getGlobalList(globalList);
-        if (!list) {
-            console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
-            return undefined;
-        }
-        for (let l of list.lists){
-            l.addElement(neighbor);
+    removeAllRecords(filterFunc){
+        this.lists = this.lists.map((value => {
+            value.filter(filterFunc);
+        }));
+    }
+
+    removeAllRecords(list,filterFunc){
+        let gList = this.getGlobalList(list);
+        if (!gList){
+            console.debug(`list ${list} doesnt exist`);
+            return;
+        }else{
+            gList = gList.filter(filterFunc);
         }
     }
+
+    // addNeighbor(globalList, neighbor) {
+    //     let list = this.getGlobalList(globalList);
+    //     if (!list) {
+    //         console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
+    //         return undefined;
+    //     }
+    //     for (let l of list.lists){
+    //         l.addElement(neighbor);
+    //     }
+    // }
 
     getAllProximityLists(globalList) {
         let list = this.getGlobalList(globalList);
@@ -89,18 +105,5 @@ class ListManager {
 
 }
 
-let listManager = new ListManager();
-listManager.addGlobalList("files", (a, b) => {
-    return a + b;
-});
-listManager.addGlobalList("names", (a, b) => {
-    return a + b;
-});
-listManager.addEntry("files",{key:"debian-jessie.iso", value: "34abe3432"});
-listManager.addEntry("files",{key:"debian-jessie2.iso", value: "34abe34"});
-// listManager.addEntry("files2",{key:"debian-jessie2.iso", value: "34abe34"});
-listManager.addNeighbor("files", {key: "debbie", value: "443aee"});
-listManager.removeEntry("files",{key:"debian-jessie2.iso", value: "34abe34"});
-console.log(listManager);
 
 module.exports = ListManager;
