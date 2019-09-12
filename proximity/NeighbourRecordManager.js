@@ -23,9 +23,9 @@ class NeighbourRecordManager {
      */
     removeNeighbour(neighbour){
         let filterFunc = function (elem) {
-            return (neighbour.pointer.id === elem.value.id);
+            return (neighbour.pointer.id !== elem.value.id);
         };
-        this.listManager.removeAllRecords(filterFunc);
+        this.listManager.removeAllRecordsFromAllLists(filterFunc);
     }
 }
 
@@ -36,15 +36,16 @@ listManager.addGlobalList("names", (a,b)=>{
     return 1;
 });
 
-listManager.addEntry("names",{key:"hadi",value:{server:"192.1"}})
+listManager.addEntry("names", {key: "hadi", value: {server: "192.1"}});
 
 let neighborManager = new NeighbourRecordManager(listManager);
-neighborManager.incorporateNeighbourList([{listEntry: "harry", pointer: {}, list: "names"},
-                                                    {listEntry: "henry", pointer: {}, list: "names"}]);
+neighborManager.incorporateNeighbourList([{listEntry: "harry", pointer: {id:"harry"}, list: "names"},
+                                                    {listEntry: "henry", pointer: {id: "henry"}, list: "names"}]);
 
 
-neighborManager.incorporateNeighbourList([{listEntry: "harry", pointer: {server:"191"}, list: "names"},
-    {listEntry: "henry", pointer: {server:"193"}, list: "names"}]);
+neighborManager.incorporateNeighbourList([{listEntry: "harry", pointer: {id:"harry",server:"191"}, list: "names"},
+    {listEntry: "henry", pointer: {id:"henry",server:"193"}, list: "names"}]);
+
 console.log(listManager);
 
 

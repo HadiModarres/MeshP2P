@@ -67,9 +67,9 @@ class ListManager {
         }
     }
 
-    removeAllRecords(filterFunc){
+    removeAllRecordsFromAllLists(filterFunc){
         for (let globalList of this.lists) {
-            for (let proxList of globalList) {
+            for (let proxList of globalList.lists) {
                 proxList.list = proxList.list.filter(filterFunc);
             }
         }
