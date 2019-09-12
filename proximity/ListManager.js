@@ -7,6 +7,7 @@ class ListManager {
     constructor() {
         this.proximityListSize = 5;
         this.lists = [];
+
     }
 
     addGlobalList(globalList, proximityFunction) {

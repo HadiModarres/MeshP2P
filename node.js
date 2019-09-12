@@ -9,6 +9,10 @@ var Promise = require("bluebird");
 let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
 let SearchRelay = require("./controllers/SearchRelay");
+const ListManager = require("./proximity/ListManager");
+const NeighbourRecordManager = require("./proximity/NeighbourRecordManager");
+
+
 const constants = require("./constants");
 
 var DEFAULT_BATCHING_DELAY_MS = 300;
@@ -38,6 +42,9 @@ class Node {
         this.header = "N/A";
         this.__controllers = [];
         this.__initCyclonNode();
+        this.listManager = new ListManager();
+        this.neighborManager = new NeighbourRecordManager();
+
         // this.__initProximityList();
         // this.__initSearchControllers();
     }
@@ -49,7 +56,7 @@ class Node {
      *
      */
     registerList(list,proximityFunction){
-
+        this.listManager.addGlobalList(list, proximityFunction);
     }
 
     /**
@@ -58,7 +65,9 @@ class Node {
      * @param entries
      */
     setEntries(list,entries){
-
+        for (let entry of entries) {
+            this.listManager.addEntry(entry);
+        }
     }
 
     /**
@@ -149,22 +158,24 @@ class Node {
             .withTickIntervalMs(20000)
             .withStorage(persistentStorage).build();
 
-        // this.__cyclonNode.on("neighbours_updated", function () {
-        //     let set = self.__cyclonNode.getNeighbourSet().getContents();
-        //     self.proximityList.addElements(Object.values(set));
-        // });
         console.info("starting node");
         this.__cyclonNode.start();
+        this.__setupHandlerForNewNeighborSet();
 
 
-        this.__listenForPackets();
-        // this.rtc.onChannel("search", function (data) {
-        //     data.receive("unionp2p", 30000).then((message) => {
-        //         console.info("data received!");
-        //         console.info(message);
-        //         self.__handleReceivedPacket(message.data);
-        //     });
-        // });
+    }
+
+    __setupHandlerForNewNeighborSet(){
+        this.__cyclonNode.on("neighbours_updated", ()=> {
+            let set = this.__cyclonNode.getNeighbourSet().getContents();
+            let pointerSet = Object.values(set);
+            for (let pointer of pointerSet){
+                let entries = pointer["metadata"]["clientInfo"].map((value) => {
+                    return {listEntry:value.listEntry ,list:value.list ,pointer:pointer}
+                });
+                this.neighborManager.incorporateNeighbourList(entries);
+            }
+        });
     }
 
     __listenForPackets(){
