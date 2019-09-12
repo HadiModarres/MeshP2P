@@ -68,9 +68,11 @@ class ListManager {
     }
 
     removeAllRecords(filterFunc){
-        this.lists = this.lists.map((value => {
-            value.filter(filterFunc);
-        }));
+        for (let globalList of this.lists) {
+            for (let proxList of globalList) {
+                proxList.list = proxList.list.filter(filterFunc);
+            }
+        }
     }
 
     removeAllRecords(list,filterFunc){
@@ -93,6 +95,19 @@ class ListManager {
     //         l.addElement(neighbor);
     //     }
     // }
+    addElementToAllProximityLists(globalList, element) {
+            let list = this.getGlobalList(globalList);
+            if (!list) {
+                        console.warn(`tried to add list element ${element} to non-existent global list: ${globalList}`);
+                        return undefined;
+            }
+        //         console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
+        //         return undefined;
+        //     }
+            for (let l of list.lists){
+                l.addElement(element);
+            }
+    }
 
     getAllProximityLists(globalList) {
         let list = this.getGlobalList(globalList);
