@@ -56,7 +56,11 @@ class Node {
      *
      */
     registerList(list,proximityFunction){
-        this.listManager.addGlobalList(list, proximityFunction);
+        let proxFunc = function (a, b) {
+            return proximityFunction(a.key, b.key);
+        };
+
+        this.listManager.addGlobalList(list, proxFunc);
     }
 
     /**

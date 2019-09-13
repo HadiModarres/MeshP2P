@@ -2,6 +2,8 @@ let Node = require("./node");
 let faker = require("faker");
 let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
+let stringSimilarity = require("string-similarity");
+
 
 
 let node = new Node();
@@ -9,7 +11,7 @@ let name = faker.name.firstName();
 while (name.charAt(0) !== 'K') {
     name = faker.name.firstName();
 }
-node.registerList("list#name", (a, b) => 1);
+node.registerList("list#name", (a, b) =>{ return stringSimilarity.compareTwoStrings(a,b)});
 node.setEntries("list#name", [name]);
 node.startNode();
 
