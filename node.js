@@ -39,11 +39,11 @@ var DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS = 5000;
 
 class Node {
     constructor() {
-        this.header = "N/A";
+        // this.header = "N/A";
         this.__controllers = [];
-        this.__initCyclonNode();
         this.listManager = new ListManager();
-        this.neighborManager = new NeighbourRecordManager();
+        this.neighborManager = new NeighbourRecordManager(this.listManager);
+        this.__initCyclonNode();
 
         // this.__initProximityList();
         // this.__initSearchControllers();
@@ -66,7 +66,7 @@ class Node {
      */
     setEntries(list,entries){
         for (let entry of entries) {
-            this.listManager.addEntry(entry);
+            this.listManager.addEntry(list,{key:entry});
         }
     }
 
@@ -141,28 +141,32 @@ class Node {
 
 // level 1
         this.rtc = new cyclonRtc.RTC(iceCandidateBatchingSignalling, channelFactory);
-        let comms = new cyclonRtcComms.WebRTCComms(this.rtc, shuffleStateFactory, console);
-        let bootStrap = new cyclonRtcComms.SignallingServerBootstrap(signallingSocket, httpRequestService);
+        this.comms = new cyclonRtcComms.WebRTCComms(this.rtc, shuffleStateFactory, console);
+        this.bootStrap = new cyclonRtcComms.SignallingServerBootstrap(signallingSocket, httpRequestService);
 
 
 // level 0
-        this.__cyclonNode = cyclon.builder(comms, bootStrap)
+
+
+    }
+
+    startNode(){
+        this.__cyclonNode = cyclon.builder(this.comms, this.bootStrap)
             .withNumNeighbours(5)
             .withMetadataProviders({
                     "clientInfo": () => {
-                        return self.header
+                        return this.neighborManager.getAllLocalEntries();
                     },
                 }
             )
             .withShuffleSize(5)
             .withTickIntervalMs(20000)
-            .withStorage(persistentStorage).build();
+            .build();
 
         console.info("starting node");
         this.__cyclonNode.start();
+        console.info(this.__cyclonNode.createNewPointer());
         this.__setupHandlerForNewNeighborSet();
-
-
     }
 
     __setupHandlerForNewNeighborSet(){
@@ -171,10 +175,15 @@ class Node {
             let pointerSet = Object.values(set);
             for (let pointer of pointerSet){
                 let entries = pointer["metadata"]["clientInfo"].map((value) => {
+                    console.info("val: ");
+                    console.info(value.list);
+
                     return {listEntry:value.listEntry ,list:value.list ,pointer:pointer}
                 });
+                console.info(entries);
                 this.neighborManager.incorporateNeighbourList(entries);
             }
+            console.info(JSON.stringify(this.listManager));
         });
     }
 

@@ -21,6 +21,7 @@ class ListManager {
 
     }
 
+
     removeAllEntries() {
         for (let l of this.lists){
             l.lists=[];
@@ -45,17 +46,19 @@ class ListManager {
     removeEntry(globalList,entry){
         let list = this.getGlobalList(globalList);
         if (!list){
-            console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
+            console.warn(`tried to remove entry ${entry} from non-existent global list: ${globalList}`);
             return;
         }
         list.lists = list.lists.filter((value) => {
            return (value.referenceElement.key !== entry.key);
         });
     }
+
     addEntry(globalList, entry) {
         let list = this.getGlobalList(globalList);
         if (!list) {
             console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}. Ignoring.`);
+            console.warn(entry);
         } else {
             for (let l of list.lists){
                 if (l.referenceElement.key === entry.key){

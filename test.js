@@ -5,6 +5,11 @@ function hello(callback) {
 class Test {
    constructor(){
    }
+   test2(){
+       const a = [];
+       a.push("a1");
+       console.log(a);
+   }
 
    test(){
        hello( () =>{
@@ -17,4 +22,4 @@ class Test {
    }
 }
 
-new Test().test();
+new Test().test2();
