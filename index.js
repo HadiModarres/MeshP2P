@@ -23,6 +23,7 @@ node.registerList("list#name", (a, b) =>{
 node.setEntries("list#name", [name]);
 node.startNode();
 
+
 // let clientInfoService = new ClientInfoService(persistentStorage);
 let neighbourSet = node.__cyclonNode.getNeighbourSet();
 
@@ -92,6 +93,10 @@ let currWindow = [];
 //     document.getElementById("neighbors").innerText = (Object.getOwnPropertyNames(set)).join("<br>");
 // };
 //
+window.onload = function () {
+    document.getElementById("name").innerText = name;
+};
+
 global.runTest = function () {
     console.info("running test");
     // rtc.openChannel("data", proximityList.getMostSimilarElement()).then((channel) => {

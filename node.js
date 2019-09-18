@@ -46,7 +46,7 @@ class Node {
         this.__initCyclonNode();
 
         // this.__initProximityList();
-        // this.__initSearchControllers();
+        this.__initSearchControllers();
     }
 
     /**
