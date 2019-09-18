@@ -98,7 +98,7 @@ global.runTest = function () {
     //     console.info(channel);
     //     channel.send("data_type", "data!");
     // });
-    let searchRequest = new SearchRequest(node, document.getElementById("new_name").value);
+    let searchRequest = new SearchRequest(node, document.getElementById("new_name").value,"list#name");
     node.attachController(searchRequest);
     searchRequest.initiateSearch();
 };

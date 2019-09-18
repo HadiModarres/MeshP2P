@@ -14,7 +14,7 @@ class SearchResponder extends NodeController{
         }
         if (this.handledPacketIds.includes(packet[constants.PACKET_FIELD.PACKET_ID])) {
             let httpReq = new cyclonRtc.HttpRequestService();
-            httpReq.get(`http://localhost:3000/stats/search_revisited?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
+            httpReq.get(`http://localhost:3500/stats/search_revisited?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
             return false;
         }else{
             if (this.handledPacketIds.length>200){
@@ -31,7 +31,7 @@ class SearchResponder extends NodeController{
         this.__sendResponseFor(packet,response);
 
         let httpReq = new cyclonRtc.HttpRequestService();
-        httpReq.get(`http://localhost:3000/stats/search_responded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
+        httpReq.get(`http://localhost:3500/stats/search_responded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
         return true;
     }
 

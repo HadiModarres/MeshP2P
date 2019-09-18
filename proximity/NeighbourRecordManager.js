@@ -10,7 +10,7 @@ class NeighbourRecordManager {
      * node pointer <pointer>, and and entry <listEntry> in global list <list>
      */
     incorporateNeighbourList(neighbourList) {
-        console.info("incorporating new set");
+        // console.info("incorporating new set");
        for (let neighbor of neighbourList){
            this.removeNeighbour(neighbor);
            this.listManager.addElementToAllProximityLists(neighbor.list,

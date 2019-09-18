@@ -25,7 +25,7 @@ class SearchRequest extends NodeController{
       for(let neighborId of neighborIds) {
          this.sendOutPacket(packet, neighborId);
          let httpReq = new cyclonRtc.HttpRequestService();
-         httpReq.get(`http://localhost:3000/stats/search_started?id=${this.id}&source_id=${this.node.__cyclonNode.getId()}&query=${this.searchTerm}`);
+         httpReq.get(`http://localhost:3500/stats/search_started?id=${this.id}&source_id=${this.node.__cyclonNode.getId()}&query=${this.searchTerm}`);
       }
    }
 

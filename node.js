@@ -171,6 +171,7 @@ class Node {
         this.__cyclonNode.start();
         console.info(this.__cyclonNode.createNewPointer());
         this.__setupHandlerForNewNeighborSet();
+        this.__listenForPackets();
     }
 
     __setupHandlerForNewNeighborSet(){
@@ -179,15 +180,15 @@ class Node {
             let pointerSet = Object.values(set);
             for (let pointer of pointerSet){
                 let entries = pointer["metadata"]["clientInfo"].map((value) => {
-                    console.info("val: ");
-                    console.info(value.list);
+                    // console.info("val: ");
+                    // console.info(value.list);
 
                     return {listEntry:value.listEntry ,list:value.list ,pointer:pointer}
                 });
-                console.info(entries);
+                // console.info(entries);
                 this.neighborManager.incorporateNeighbourList(entries);
             }
-            console.info(JSON.stringify(this.listManager));
+            // console.info(JSON.stringify(this.listManager));
             this.__sendNeighborsToStatsServer();
         });
 
@@ -232,7 +233,7 @@ class Node {
                 return;
         }
         let httpReq = new cyclonRtc.HttpRequestService();
-        httpReq.get(`http://localhost:3000/stats/search_discarded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
+        httpReq.get(`http://localhost:3500/stats/search_discarded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
     }
 
     /**
