@@ -14,21 +14,35 @@ class ProximityList {
         this.compareFunc = undefined;
     }
 
+    scoreForElement(element){
+        return this.proximityFunc(this.referenceElement, element);
+    }
+
     uniqueElements(compareFunc){
        this.compareFunc = compareFunc;
     }
 
+    // perfectMatchForElement(element){
+    //     if (this.proximityFunc(this.referenceElement,element)===1){
+    //         return this.referenceElement;
+    //     }
+    //     for (let e of this.list) {
+    //         if (this.proximityFunc(e,element)===1){
+    //             return e;
+    //         }
+    //     }
+    //     return undefined;
+    // }
+
     perfectMatchForElement(element){
-        if (this.proximityFunc(this.referenceElement,element)===1){
-            return this.referenceElement;
-        }
-        for (let e of this.list) {
-            if (this.proximityFunc(e,element)===1){
+        for (let e of [this.referenceElement, ...this.list]) {
+            if (JSON.stringify(e.key) === JSON.stringify(element.key)) {
                 return e;
             }
         }
         return undefined;
     }
+
 
     NearestNodesTo(element,count){
         let ind=-1;

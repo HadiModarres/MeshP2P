@@ -10,5 +10,6 @@ module.exports.PACKET_FIELD = {
    PACKET_SOURCE: "packet_source",
    QUERY: "query",
    HOPS: "hops",
-   BODY:"body"
+   BODY:"body",
+   LIST: "list"
 };

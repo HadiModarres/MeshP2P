@@ -5,11 +5,12 @@ var cyclonRtc = require('cyclon.p2p-rtc-client');
 
 
 class SearchRequest extends NodeController{
-   constructor(node,searchTerm){
+   constructor(node,searchTerm,list){
       super(node);
       this.searchTerm = searchTerm;
       this.id = uuid();
       this.responses = [];
+      this.list = list;
    }
 
    initiateSearch(){
@@ -20,6 +21,7 @@ class SearchRequest extends NodeController{
       packet[constants.PACKET_FIELD.PACKET_TYPE] = constants.PACKET_TYPE.SEARCH_REQ;
       packet[constants.PACKET_FIELD.HOPS] = 1;
       packet[constants.PACKET_FIELD.QUERY]= this.searchTerm;
+      packet[constants.PACKET_FIELD.LIST]= this.list;
       for(let neighborId of neighborIds) {
          this.sendOutPacket(packet, neighborId);
          let httpReq = new cyclonRtc.HttpRequestService();

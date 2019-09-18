@@ -23,7 +23,17 @@ class NeighbourRecordManager {
      * returns the proximity list that has the closest reference element to <neighbor>
      */
     proxListWithClosestRefToNeighbor(neighbor){
-
+        let proxLists = this.listManager.getAllProximityLists(neighbor.list);
+        let bestProxList = undefined;
+        let bestScore = Number.NEGATIVE_INFINITY;
+        for (let proxList of proxLists){
+            let score = proxList.scoreForElement({key: neighbor.listEntry});
+            if (score>bestScore){
+                bestScore = score;
+                bestProxList = proxList;
+            }
+        }
+        return bestProxList;
     }
 
     /**

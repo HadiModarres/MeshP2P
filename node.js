@@ -156,7 +156,7 @@ class Node {
 
     startNode(){
         this.__cyclonNode = cyclon.builder(this.comms, this.bootStrap)
-            .withNumNeighbours(10)
+            .withNumNeighbours(5)
             .withMetadataProviders({
                     "clientInfo": () => {
                         return this.neighborManager.getAllLocalEntries();

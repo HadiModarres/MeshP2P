@@ -30,11 +30,13 @@ class SearchRelay extends NodeController{
                 "metadata": {
                     "clientInfo": packet[constants.PACKET_FIELD.QUERY]
                 }};
-            let nearNodes = this.node.proximityList.NearestNodesTo(elem, n);
+            let bestProxList = this.node.neighborManager.proxListWithClosestRefToNeighbor(
+                {listEntry: packet[constants.PACKET_FIELD.QUERY], list: packet[constants.PACKET_FIELD.LIST]});
+            let nearNodes = bestProxList.NearestNodesTo({key:packet[constants.PACKET_FIELD.QUERY]}, n);
             let httpReq = new cyclonRtc.HttpRequestService();
             httpReq.get(`http://localhost:3000/stats/search_relayed?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
             for (let node of nearNodes) {
-                this.sendOutPacket(packet, node).then((value => {
+                this.sendOutPacket(packet, node.value).then((value => {
                     console.info("relayed search request");
                 }),(reason => {
                     console.info("couldnt relay request");

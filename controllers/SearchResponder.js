@@ -36,16 +36,14 @@ class SearchResponder extends NodeController{
     }
 
     __responseForPacket(packet){
-        let elem = {
-            "metadata": {
-                "clientInfo": packet[constants.PACKET_FIELD.QUERY]
-            }};
-        let match = this.node.proximityList.perfectMatchForElement(elem);
-        if (!match){
-            return undefined;
-        }else{
-            return match["metadata"]["clientInfo"];
+        let proxLists = this.node.listManager.getAllProximityLists(packet[constants.PACKET_FIELD.LIST]);
+        for (let proxList of proxLists){
+            let match = proxList.perfectMatchForElement({key:packet[constants.PACKET_FIELD.QUERY]});
+            if(match){
+                return match;
+            }
         }
+        return undefined;
     }
 
     __sendResponseFor(packet,responseBody){
