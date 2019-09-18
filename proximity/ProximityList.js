@@ -44,19 +44,38 @@ class ProximityList {
     }
 
 
-    NearestNodesTo(element,count){
-        let ind=-1;
-        let score = this.proximityFunc(this.referenceElement, element);
-        for (let i=0;i<this.list.length;i++){
-            if (score>this.list[i].proximityScore){
-                ind = i;
+    // NearestNodesTo(element,count){
+    //     let ind=-1;
+    //     let score = this.proximityFunc(this.referenceElement, element);
+    //     for (let i=0;i<this.list.length;i++){
+    //         if (score>this.list[i].proximityScore){
+    //             ind = i;
+    //         }
+    //     }
+    //     if (ind===-1){
+    //         return [];
+    //     }else{
+    //         return this.list.slice(ind - (count / 2), count);
+    //     }
+    // }
+
+    nearestNodesTo(element,count){
+        let scores = this.list.map((value => {
+            let score = this.proximityFunc(element, value);
+            return {score, elem: value};
+        }));
+        scores = scores.sort((a, b) => {
+            if (a.score > b.score) {
+                return -1;
+            } else if (a.score === b.score) {
+                return 0;
+            } else {
+                return 1;
             }
-        }
-        if (ind===-1){
-            return [];
-        }else{
-            return this.list.slice(ind - (count / 2), count);
-        }
+        });
+        return scores.slice(0, count).map((value => {
+            return value.elem;
+        }));
     }
 
     /**

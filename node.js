@@ -43,6 +43,7 @@ class Node {
         this.__controllers = [];
         this.listManager = new ListManager();
         this.neighborManager = new NeighbourRecordManager(this.listManager);
+        this.name = '';
         this.__initCyclonNode();
 
         // this.__initProximityList();
@@ -233,7 +234,7 @@ class Node {
                 return;
         }
         let httpReq = new cyclonRtc.HttpRequestService();
-        httpReq.get(`http://localhost:3500/stats/search_discarded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
+        httpReq.get(`http://localhost:3500/stats/search_discarded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}&node_name=${this.name}`);
     }
 
     /**

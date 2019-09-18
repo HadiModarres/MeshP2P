@@ -21,6 +21,7 @@ node.registerList("list#name", (a, b) =>{
     return 200-Math.sqrt(Math.pow((x1-x2),2)+Math.pow((y1-y2),2));
 });
 node.setEntries("list#name", [name]);
+node.name= name;
 node.startNode();
 
 

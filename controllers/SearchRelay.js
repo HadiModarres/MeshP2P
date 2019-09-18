@@ -6,7 +6,7 @@ class SearchRelay extends NodeController{
     constructor(node){
         super(node);
         this.handledPacketIds = [];
-        this.maximumHops = 4;
+        this.maximumHops = 5;
     }
     handlePacket(packet){
         console.info("testing relay");
@@ -32,9 +32,11 @@ class SearchRelay extends NodeController{
                 }};
             let bestProxList = this.node.neighborManager.proxListWithClosestRefToNeighbor(
                 {listEntry: packet[constants.PACKET_FIELD.QUERY], list: packet[constants.PACKET_FIELD.LIST]});
-            let nearNodes = bestProxList.NearestNodesTo({key:packet[constants.PACKET_FIELD.QUERY]}, n);
+            let nearNodes = bestProxList.nearestNodesTo({key:packet[constants.PACKET_FIELD.QUERY]}, n);
+            console.info("near nodes: ");
+            console.info(nearNodes);
             let httpReq = new cyclonRtc.HttpRequestService();
-            httpReq.get(`http://localhost:3500/stats/search_relayed?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
+            httpReq.get(`http://localhost:3500/stats/search_relayed?id=${packet[constants.PACKET_FIELD.PACKET_ID]}&node_name=${this.node.name}`);
             for (let node of nearNodes) {
                 this.sendOutPacket(packet, node.value).then((value => {
                     console.info("relayed search request");
@@ -42,6 +44,7 @@ class SearchRelay extends NodeController{
                     console.info("couldnt relay request");
                 }));
             }
+            return true;
         }
     }
 }
