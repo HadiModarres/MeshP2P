@@ -156,7 +156,7 @@ class Node {
 
     startNode(){
         this.__cyclonNode = cyclon.builder(this.comms, this.bootStrap)
-            .withNumNeighbours(5)
+            .withNumNeighbours(10)
             .withMetadataProviders({
                     "clientInfo": () => {
                         return this.neighborManager.getAllLocalEntries();
@@ -188,8 +188,28 @@ class Node {
                 this.neighborManager.incorporateNeighbourList(entries);
             }
             console.info(JSON.stringify(this.listManager));
+            this.__sendNeighborsToStatsServer();
         });
+
     }
+
+    // http://localhost:3500/stats/neighbors_updated?json={%22id%22:%224,3%22,%22neighbors%22:[%223,5%22,%227,1%22]}
+    __sendNeighborsToStatsServer(){
+
+        let httpReq = new cyclonRtc.HttpRequestService();
+
+        let proxList = this.listManager.getAllProximityLists("list#name")[0];
+        let neighbors = proxList.getAllElements();
+        neighbors = neighbors.map((value) => {
+            return `"${value.key}"`;
+        });
+
+        let localEntry = this.neighborManager.getAllLocalEntries()[0].listEntry;
+
+        httpReq.get(`http://localhost:3500/stats/neighbors_updated?json={"id":"${localEntry}","neighbors":[${neighbors}]}`);
+
+    }
+
 
     __listenForPackets(){
         let self =this;

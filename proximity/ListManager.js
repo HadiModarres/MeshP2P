@@ -5,7 +5,7 @@ let ProximityList = require("./ProximityList");
  */
 class ListManager {
     constructor() {
-        this.proximityListSize = 5;
+        this.proximityListSize = 4;
         this.lists = [];
 
     }

@@ -20,6 +20,13 @@ class NeighbourRecordManager {
     }
 
     /**
+     * returns the proximity list that has the closest reference element to <neighbor>
+     */
+    proxListWithClosestRefToNeighbor(neighbor){
+
+    }
+
+    /**
      * @return return all entries in the form of {listEntry,list}
      */
     getAllLocalEntries(){

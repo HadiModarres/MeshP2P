@@ -391,6 +391,18 @@ describe("The Channel", function() {
                         })
                         .cancel();
 				});
+
+				it('will return any unhandled messages before returning new ones', function(done) {
+					rtcDataChannel.onmessage({
+						data: JSON.stringify(MESSAGE)
+					});
+					
+					channel.receive(MESSAGE_TYPE, RECEIVE_TIMEOUT_MS)
+						.then(function(result) {
+                            expect(result).toBe(MESSAGE_PAYLOAD);
+                            done();
+                        });
+				});
 			});
 		});
 	});

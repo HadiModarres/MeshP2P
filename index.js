@@ -7,11 +7,19 @@ let stringSimilarity = require("string-similarity");
 
 
 let node = new Node();
-let name = faker.name.firstName();
-while (name.charAt(0) !== 'K') {
-    name = faker.name.firstName();
-}
-node.registerList("list#name", (a, b) =>{ return stringSimilarity.compareTwoStrings(a,b)});
+// let name = faker.name.firstName();
+// while (name.charAt(0) !== 'K') {
+//     name = faker.name.firstName();
+// }
+let name = `${Math.floor(Math.random()*100)},${Math.floor(Math.random()*100)}`;
+node.registerList("list#name", (a, b) =>{
+    let x1 = a.split(",")[0];
+    let y1 = a.split(",")[1];
+
+    let x2 = b.split(",")[0];
+    let y2 = b.split(",")[1];
+    return 200-Math.sqrt(Math.pow((x1-x2),2)+Math.pow((y1-y2),2));
+});
 node.setEntries("list#name", [name]);
 node.startNode();
 
