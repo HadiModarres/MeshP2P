@@ -36,7 +36,7 @@ class SearchRelay extends NodeController{
             let sortedList = bestProxList.sortListOnProximityToElement(allEntries, {key: packet[constants.PACKET_FIELD.QUERY]});
 
             // let nearNodes = bestProxList.nearestNodesTo({key:packet[constants.PACKET_FIELD.QUERY]}, n);
-            let nearNodes = sortedList.slice(0, n);
+            let nearNodes = sortedList.slice(0, 2);
             let refScore = bestProxList.scoreForElement({key: packet[constants.PACKET_FIELD.QUERY]});
 
             nearNodes = nearNodes.filter((value) => {

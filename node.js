@@ -14,7 +14,7 @@ const NeighbourRecordManager = require("./proximity/NeighbourRecordManager");
 
 
 const constants = require("./constants");
-
+let logger = {info: (msg)=>{console.info(msg)},log:()=>{},debug:()=>{},warn:()=>{},error:()=>{}};
 var DEFAULT_BATCHING_DELAY_MS = 300;
 var DEFAULT_SIGNALLING_SERVERS = [
     {
@@ -126,27 +126,27 @@ class Node {
 
 
 //level4
-//         let rtcObjectFactory = new cyclonRtc.AdapterJsRTCObjectFactory(console);
-        let rtcObjectFactory = new cyclonRtc.NativeRTCObjectFactory(console);
-        let signallingSocket = new cyclonRtc.RedundantSignallingSocket(signallingServerService, socketFactory, console, Utils.asyncExecService(), signallingServerSelector);
+//         let rtcObjectFactory = new cyclonRtc.AdapterJsRTCObjectFactory(logger);
+        let rtcObjectFactory = new cyclonRtc.NativeRTCObjectFactory(logger);
+        let signallingSocket = new cyclonRtc.RedundantSignallingSocket(signallingServerService, socketFactory, logger, Utils.asyncExecService(), signallingServerSelector);
         let httpRequestService = new cyclonRtc.HttpRequestService();
 
 
 //level3
-        let signallingService = new cyclonRtc.SocketIOSignallingService(signallingSocket, console, httpRequestService, persistentStorage);
-        let peerConnectionFactory = new cyclonRtc.PeerConnectionFactory(rtcObjectFactory, console, DEFAULT_ICE_SERVERS, DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
+        let signallingService = new cyclonRtc.SocketIOSignallingService(signallingSocket, logger, httpRequestService, persistentStorage);
+        let peerConnectionFactory = new cyclonRtc.PeerConnectionFactory(rtcObjectFactory, logger, DEFAULT_ICE_SERVERS, DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
 
 
 //level 2
         let iceCandidateBatchingSignalling = new cyclonRtc.IceCandidateBatchingSignallingService(Utils.asyncExecService(),
             signallingService, DEFAULT_BATCHING_DELAY_MS);
-        let channelFactory = new cyclonRtc.ChannelFactory(peerConnectionFactory, iceCandidateBatchingSignalling, console);
-        let shuffleStateFactory = new cyclonRtcComms.ShuffleStateFactory(console, Utils.asyncExecService());
+        let channelFactory = new cyclonRtc.ChannelFactory(peerConnectionFactory, iceCandidateBatchingSignalling, logger);
+        let shuffleStateFactory = new cyclonRtcComms.ShuffleStateFactory(logger, Utils.asyncExecService());
 
 
 // level 1
         this.rtc = new cyclonRtc.RTC(iceCandidateBatchingSignalling, channelFactory);
-        this.comms = new cyclonRtcComms.WebRTCComms(this.rtc, shuffleStateFactory, console);
+        this.comms = new cyclonRtcComms.WebRTCComms(this.rtc, shuffleStateFactory, logger);
         this.bootStrap = new cyclonRtcComms.SignallingServerBootstrap(signallingSocket, httpRequestService);
 
 
