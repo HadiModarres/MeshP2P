@@ -12,9 +12,10 @@ class Test {
    }
 
    test(){
-       hello( () =>{
-           this.hello2();
-       });
+       let entries = [4];
+       let a = [1, 2, 3];
+       entries.push(...a);
+       console.info(entries);
    }
 
    hello2(){
@@ -22,4 +23,4 @@ class Test {
    }
 }
 
-new Test().test2();
+new Test().test();

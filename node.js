@@ -175,24 +175,41 @@ class Node {
         this.__listenForPackets();
     }
 
+    /**
+     *
+     * @param nodePointers these are pointers defined in cyclon.p2p
+     * @private
+     */
+    __extractListEntriesFromPointers(nodePointers){
+       let listEntries = [];
+        for (let pointer of nodePointers){
+            let entries = pointer["metadata"]["clientInfo"].map((value) => {
+                return {listEntry:value.listEntry ,list:value.list ,pointer:pointer}
+            });
+            listEntries.push(...entries);
+        }
+        return listEntries;
+    }
+
+    __getRandomEntriesForList(list){
+        let randomPointers = this.getRandomSamplePointers();
+        let randomEntries = this.__extractListEntriesFromPointers(randomPointers);
+        return randomEntries.filter((value => {
+            if (value.list === list) {
+                return true;
+            } else {
+                return false;
+            }
+        }));
+    }
+
     __setupHandlerForNewNeighborSet(){
         this.__cyclonNode.on("neighbours_updated", ()=> {
-            let set = this.__cyclonNode.getNeighbourSet().getContents();
-            let pointerSet = Object.values(set);
-            for (let pointer of pointerSet){
-                let entries = pointer["metadata"]["clientInfo"].map((value) => {
-                    // console.info("val: ");
-                    // console.info(value.list);
-
-                    return {listEntry:value.listEntry ,list:value.list ,pointer:pointer}
-                });
-                // console.info(entries);
-                this.neighborManager.incorporateNeighbourList(entries);
-            }
-            // console.info(JSON.stringify(this.listManager));
+            let pointerSet = this.getRandomSamplePointers();
+            let entries = this.__extractListEntriesFromPointers(pointerSet);
+            this.neighborManager.incorporateNeighbourList(entries);
             this.__sendNeighborsToStatsServer();
         });
-
     }
 
     // http://localhost:3500/stats/neighbors_updated?json={%22id%22:%224,3%22,%22neighbors%22:[%223,5%22,%227,1%22]}
@@ -293,9 +310,9 @@ class Node {
             return value.id;
         });
     }
-    getProximityPointers(){
-        return this.proximityList.getAllElements();
-    }
+    // getProximityPointers(){
+    //     return this.proximityList.getAllElements();
+    // }
 
     getRandomSamplePointers(){
         return Object.values(this.__cyclonNode.getNeighbourSet().getContents());

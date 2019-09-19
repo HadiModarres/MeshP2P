@@ -16,7 +16,7 @@ class NodeController {
     /**
      *
      * @param packet
-     * @return {Promise}
+     *
      */
     sendOutPacket(packet,targetNode){
         packet["date"] = new Date().getDate();
