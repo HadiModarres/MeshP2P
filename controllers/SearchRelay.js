@@ -37,6 +37,16 @@ class SearchRelay extends NodeController{
 
             // let nearNodes = bestProxList.nearestNodesTo({key:packet[constants.PACKET_FIELD.QUERY]}, n);
             let nearNodes = sortedList.slice(0, n);
+            let refScore = bestProxList.scoreForElement({key: packet[constants.PACKET_FIELD.QUERY]});
+
+            nearNodes = nearNodes.filter((value) => {
+                if (value.score>refScore){
+                    return true;
+                }else{
+                    return false;
+                }
+            });
+
             console.info("near nodes: ");
             console.info(nearNodes);
             let httpReq = new cyclonRtc.HttpRequestService();
