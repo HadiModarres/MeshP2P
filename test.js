@@ -23,4 +23,6 @@ class Test {
    }
 }
 
-new Test().test();
+// new Test().test();
+let a=undefined;
+console.log(!a && a!==0);

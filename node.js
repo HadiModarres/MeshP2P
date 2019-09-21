@@ -14,7 +14,8 @@ const NeighbourRecordManager = require("./proximity/NeighbourRecordManager");
 
 
 const constants = require("./constants");
-let logger = {info: (msg)=>{console.info(msg)},log:()=>{},debug:()=>{},warn:()=>{},error:()=>{}};
+// let logger = {info: (msg)=>{console.info(msg)},log:()=>{},debug:()=>{},warn:()=>{},error:()=>{}};
+let logger = console;
 var DEFAULT_BATCHING_DELAY_MS = 300;
 var DEFAULT_SIGNALLING_SERVERS = [
     {
@@ -167,6 +168,18 @@ class Node {
             .withShuffleSize(5)
             .withTickIntervalMs(20000)
             .build();
+
+        this.__cyclonNode.on("shuffleCompleted",(direction)=>{
+            console.info("shuffle completed");
+        });
+
+        this.__cyclonNode.on("shuffleError", (direction) => {
+            console.error("shuffle error");
+        });
+
+        this.__cyclonNode.on("shuffleTimeout", (direction) => {
+            console.error("shuffle timeout");
+        });
 
         console.info("starting node");
         this.__cyclonNode.start();
