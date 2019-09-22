@@ -21,13 +21,6 @@ class ListManager {
 
     }
 
-
-    removeAllEntries() {
-        for (let l of this.lists){
-            l.lists=[];
-        }
-    }
-
     /**
      *
      * @param globalList
@@ -44,6 +37,10 @@ class ListManager {
 
 
     removeEntry(globalList,entry){
+        if (!entry.key && entry.key!==0){
+            // bad element -> no key
+            throw Error("List Manager: entry to be removed should have a key");
+        }
         let list = this.getGlobalList(globalList);
         if (!list){
             console.warn(`tried to remove entry ${entry} from non-existent global list: ${globalList}`);
@@ -55,6 +52,10 @@ class ListManager {
     }
 
     addEntry(globalList, entry) {
+        if (!entry.key && entry.key!==0){
+            // bad element -> no key
+            throw Error("List Manager: entry to be added should have a key");
+        }
         let list = this.getGlobalList(globalList);
         if (!list) {
             console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}. Ignoring.`);
@@ -79,35 +80,12 @@ class ListManager {
         }
     }
 
-    removeAllRecords(list,filterFunc){
-        let gList = this.getGlobalList(list);
-        if (!gList){
-            console.debug(`list ${list} doesnt exist`);
-            return;
-        }else{
-            gList = gList.filter(filterFunc);
-        }
-    }
-
-    // addNeighbor(globalList, neighbor) {
-    //     let list = this.getGlobalList(globalList);
-    //     if (!list) {
-    //         console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
-    //         return undefined;
-    //     }
-    //     for (let l of list.lists){
-    //         l.addElement(neighbor);
-    //     }
-    // }
     addElementToAllProximityLists(globalList, element) {
             let list = this.getGlobalList(globalList);
             if (!list) {
                         console.warn(`tried to add list element ${element} to non-existent global list: ${globalList}`);
                         return undefined;
             }
-        //         console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
-        //         return undefined;
-        //     }
             for (let l of list.lists){
                 l.addElement(element);
             }

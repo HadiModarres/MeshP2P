@@ -40,14 +40,11 @@ var DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS = 5000;
 
 class Node {
     constructor() {
-        // this.header = "N/A";
         this.__controllers = [];
         this.listManager = new ListManager();
         this.neighborManager = new NeighbourRecordManager(this.listManager);
         this.name = '';
         this.__initCyclonNode();
-
-        // this.__initProximityList();
         this.__initSearchControllers();
     }
 
@@ -102,16 +99,6 @@ class Node {
         let searchRelay = new SearchRelay(this);
         this.attachController(searchRelay);
     }
-
-    __initProximityList() {
-        this.proximityList = new ProximityList(6, this.__cyclonNode.createNewPointer(), (a, b) => {
-            return stringSimilarity.compareTwoStrings(a["metadata"]["clientInfo"], b["metadata"]["clientInfo"]);
-        });
-        this.proximityList.uniqueElements((a, b) => {
-            return a["id"] === b["id"];
-        });
-    }
-
 
 
     __initCyclonNode() {
