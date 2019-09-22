@@ -10,7 +10,6 @@ let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
 let SearchRelay = require("./controllers/SearchRelay");
 const ListManager = require("./proximity/ListManager");
-const NeighbourRecordManager = require("./proximity/NeighbourRecordManager");
 
 
 const constants = require("./constants");
@@ -42,7 +41,6 @@ class Node {
     constructor() {
         this.__controllers = [];
         this.listManager = new ListManager();
-        this.neighborManager = new NeighbourRecordManager(this.listManager);
         this.name = '';
         this.__initCyclonNode();
         this.__initSearchControllers();
@@ -55,11 +53,7 @@ class Node {
      *
      */
     registerList(list,proximityFunction){
-        let proxFunc = function (a, b) {
-            return proximityFunction(a.key, b.key);
-        };
-
-        this.listManager.addGlobalList(list, proxFunc);
+        this.listManager.addGlobalList(list, proximityFunction);
     }
 
     /**
@@ -148,7 +142,7 @@ class Node {
             .withNumNeighbours(5)
             .withMetadataProviders({
                     "clientInfo": () => {
-                        return this.neighborManager.getAllLocalEntries();
+                        return this.listManager.getAllLocalEntries();
                     },
                 }
             )
@@ -184,7 +178,7 @@ class Node {
        let listEntries = [];
         for (let pointer of nodePointers){
             let entries = pointer["metadata"]["clientInfo"].map((value) => {
-                return {listEntry:value.listEntry ,list:value.list ,pointer:pointer}
+                return {key:value.key ,list:value.list ,pointer:pointer}
             });
             listEntries.push(...entries);
         }
@@ -207,12 +201,26 @@ class Node {
         this.__cyclonNode.on("neighbours_updated", ()=> {
             let pointerSet = this.getRandomSamplePointers();
             let entries = this.__extractListEntriesFromPointers(pointerSet);
-            this.neighborManager.incorporateNeighbourList(entries);
+            this.__incorporateNeighbourList(entries);
             this.__sendNeighborsToStatsServer();
         });
     }
 
-    // http://localhost:3500/stats/neighbors_updated?json={%22id%22:%224,3%22,%22neighbors%22:[%223,5%22,%227,1%22]}
+    __incorporateNeighbourList(neighbourList) {
+        for (let neighbor of neighbourList){
+            this.__removeNeighbour(neighbor);
+            this.listManager.addElementToAllProximityLists(neighbor.list,
+                {key:neighbor.key,value:neighbor.pointer})
+        }
+    }
+
+    __removeNeighbour(neighbour){
+        let filterFunc = function (elem) {
+            return (neighbour.pointer.id !== elem.value.id);
+        };
+        this.listManager.removeAllRecordsFromAllLists(filterFunc);
+    }
+
     __sendNeighborsToStatsServer(){
 
         let httpReq = new cyclonRtc.HttpRequestService();
@@ -223,8 +231,7 @@ class Node {
             return `"${value.key}"`;
         });
 
-        let localEntry = this.neighborManager.getAllLocalEntries()[0].listEntry;
-
+        let localEntry = this.listManager.getAllLocalEntries()[0].key;
         httpReq.get(`http://localhost:3500/stats/neighbors_updated?json={"id":"${localEntry}","neighbors":[${neighbors}]}`);
 
     }
@@ -284,35 +291,10 @@ class Node {
         return undefined;
     }
 
-    setSearchableHeader(header) {
-        this.header = header;
-        this.__initProximityList();
-    }
-
-    setSearchable(bool) {
-
-    }
 
     attachController(controller) {
         this.__controllers.push(controller);
     }
-
-    detachController(controller) {
-
-    }
-
-    getController(type) {
-
-    }
-
-    getProximityIds() {
-        return this.proximityList.getAllElements().map((value) => {
-            return value.id;
-        });
-    }
-    // getProximityPointers(){
-    //     return this.proximityList.getAllElements();
-    // }
 
     getRandomSamplePointers(){
         return Object.values(this.__cyclonNode.getNeighbourSet().getContents());
@@ -322,11 +304,9 @@ class Node {
             return value.id;
         }));
     }
-
     getId() {
         return this.__cyclonNode.getId();
     }
-
 
 }
 

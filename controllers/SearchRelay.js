@@ -26,7 +26,7 @@ class SearchRelay extends NodeController{
         if (n===1){
             return false;
         }else {
-            let bestProxList = this.node.neighborManager.proxListWithClosestRefToNeighbor(
+            let bestProxList = this.node.listManager.proxListWithClosestRefToNeighbor(
                 {listEntry: packet[constants.PACKET_FIELD.QUERY], list: packet[constants.PACKET_FIELD.LIST]});
             let randomEntries = this.node.__getRandomEntriesForList(packet[constants.PACKET_FIELD.LIST]);
             randomEntries = randomEntries.map((value => {

@@ -100,6 +100,37 @@ class ListManager {
         return list.lists;
     }
 
+
+    /**
+     * @return return all entries in the form of {key,list}
+     */
+    getAllLocalEntries(){
+        const allEntries = [];
+        for (let list of this.lists){
+            for (let proxList of list.lists){
+                allEntries.push({list: list.listName, key: proxList.referenceElement.key});
+            }
+        }
+        return allEntries
+    }
+
+    /**
+     * returns the proximity list that has the closest reference element key to <key> in <globalList>
+     */
+    proxListWithClosestRefToElement(key,globalList){
+        let proxLists = this.getAllProximityLists(globalList);
+        let bestProxList = undefined;
+        let bestScore = Number.NEGATIVE_INFINITY;
+        for (let proxList of proxLists){
+            let score = proxList.scoreForElement({key});
+            if (score>bestScore){
+                bestScore = score;
+                bestProxList = proxList;
+            }
+        }
+        return bestProxList;
+    }
+
 }
 
 

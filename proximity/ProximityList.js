@@ -134,7 +134,7 @@ class ProximityList {
 // for (let i=0;i<20;i++){
 //     proxList.addElement({key: i,value:i});
 // }
-console.log(proxList);
+// console.log(proxList);
 
 module.exports = ProximityList;
 
