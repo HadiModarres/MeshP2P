@@ -22,10 +22,13 @@ class SearchRequest extends NodeController{
       packet[constants.PACKET_FIELD.HOPS] = 1;
       packet[constants.PACKET_FIELD.QUERY]= this.searchTerm;
       packet[constants.PACKET_FIELD.LIST]= this.list;
+
+      this.emit("stats", constants.EVENTS.SEARCH_START, this.id, this.node.name, this.searchTerm, neighborIds.length);
       for(let neighborId of neighborIds) {
          this.sendOutPacket(packet, neighborId);
-         let httpReq = new cyclonRtc.HttpRequestService();
-         httpReq.get(`http://localhost:3500/stats/search_started?id=${this.id}&source_name=${this.node.name}&query=${this.searchTerm}`);
+
+         // let httpReq = new cyclonRtc.HttpRequestService();
+         // httpReq.get(`http://localhost:3500/stats/search_started?id=${this.id}&source_name=${this.node.name}&query=${this.searchTerm}`);
       }
    }
 

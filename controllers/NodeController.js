@@ -1,5 +1,8 @@
-class NodeController {
+var EventEmitter = require("events").EventEmitter;
+
+class NodeController extends EventEmitter{
     constructor(node) {
+        super();
         this.node = node;
     }
 

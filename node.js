@@ -10,6 +10,7 @@ let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
 let SearchRelay = require("./controllers/SearchRelay");
 const ListManager = require("./proximity/ListManager");
+const stats = require("./stats/Stats");
 
 
 const constants = require("./constants");
@@ -44,8 +45,14 @@ class Node {
         this.name = '';
         this.__initCyclonNode();
         this.__initSearchControllers();
+        this.__addEventListeners();
     }
 
+    __addEventListeners(){
+        for (let c of this.__controllers) {
+            stats.addEventEmitter(c);
+        }
+    }
     /**
      * Register a global list on this node
      * @param list
@@ -139,7 +146,7 @@ class Node {
 
     startNode(){
         this.__cyclonNode = cyclon.builder(this.comms, this.bootStrap)
-            .withNumNeighbours(5)
+            .withNumNeighbours(12)
             .withMetadataProviders({
                     "clientInfo": () => {
                         return this.listManager.getAllLocalEntries();
