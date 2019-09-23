@@ -10,7 +10,7 @@ let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
 let SearchRelay = require("./controllers/SearchRelay");
 const ListManager = require("./proximity/ListManager");
-const stats = require("./stats/Stats");
+const stats = require("./stats/StatsRecorder");
 
 
 const constants = require("./constants");

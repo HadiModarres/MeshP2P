@@ -3,7 +3,7 @@ let faker = require("faker");
 let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
 let stringSimilarity = require("string-similarity");
-let stats = require("./stats/Stats");
+let stats = require("./stats/StatsRecorder");
 
 
 
