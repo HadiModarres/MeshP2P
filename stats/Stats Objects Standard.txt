@@ -1,0 +1,34 @@
+Standard for emitted stats objects:
+
+Search Request:
+{
+    id: search request id
+    source_name: requesting node name
+    query: search query
+}
+
+
+Search Relay:
+{
+    id: search request id
+    source_name: requesting node name
+}
+
+
+Search Response:
+{
+    id: search request id
+    source_name: requesting node name
+}
+
+Search Discard:
+{
+    id: search request id
+    source_name: requesting node name
+}
+
+Search Discard:
+{
+    id: search request id
+    source_name: requesting node name
+}

@@ -2,6 +2,7 @@ const constants = require('../constants');
 class StatsRecorder{
     constructor(statsRecorder){
        this.eventEmitters = [];
+       this.eventsBacklog = [];
     }
     addEventEmitter(ee){
        this.eventEmitters.push(ee) ;
