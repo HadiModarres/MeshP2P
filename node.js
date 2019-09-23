@@ -44,10 +44,10 @@ class Node {
         this.__controllers = [];
         this.listManager = new ListManager();
         this.name = '';
-        this.statsRecorder = new StatsRecorder();
+        // this.statsRecorder = new StatsRecorder();
         this.__initCyclonNode();
         this.__initSearchControllers();
-        this.__addEventListeners();
+        // this.__addEventListeners();
         this.intervalProbe = new IntervalProbe(this,1,4);
     }
 
@@ -144,10 +144,6 @@ class Node {
 
 // level 0
 
-
-    }
-
-    startNode(){
         this.__cyclonNode = cyclon.builder(this.comms, this.bootStrap)
             .withNumNeighbours(12)
             .withMetadataProviders({
@@ -160,6 +156,10 @@ class Node {
             .withTickIntervalMs(20000)
             .build();
 
+
+    }
+
+    startNode(){
         this.__cyclonNode.on("shuffleCompleted",(direction)=>{
             console.info("shuffle completed");
         });

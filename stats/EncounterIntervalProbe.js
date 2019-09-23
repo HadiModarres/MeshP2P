@@ -48,8 +48,9 @@ class EncounterIntervalProbe extends EventEmitter{
          }
       }
       // all samples have gathered 3 encounters, finish criteria triggered
+      console.info(JSON.stringify(this.samples));
       let totalAvg = this.samples.map((value)=>{
-         return (value.encounters[this._sampleSize-1]-value.encounters[0])/this._sampleSize;
+         return (value.encounters[value.encounters.length-1])/this._encounterCounts;
       }).reduce(((previousValue, currentValue) => {
         return previousValue+currentValue;
       }),0);
@@ -68,6 +69,7 @@ class EncounterIntervalProbe extends EventEmitter{
       });
       for (let sample of this.samples){
          if (neighborIds.includes(sample.id)){
+             console.info("encountered");
             sample.encounters.push(this.currentIndex);
          }
       }
