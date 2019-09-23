@@ -25,7 +25,7 @@ class EncounterIntervalProbe extends EventEmitter{
       this._node = node;
       this._sampleSize = sampleSize;
       this._encounterCounts = encounterCounts;
-      this.samples= []
+      this.samples= [];
       this.currentIndex= 0;
       this._gatherData();
    }
@@ -50,7 +50,7 @@ class EncounterIntervalProbe extends EventEmitter{
       // all samples have gathered 3 encounters, finish criteria triggered
       console.info(JSON.stringify(this.samples));
       let totalAvg = this.samples.map((value)=>{
-         return (value.encounters[value.encounters.length-1])/this._encounterCounts;
+         return (value.encounters[value.encounters.length-1]-1)/this._encounterCounts;
       }).reduce(((previousValue, currentValue) => {
         return previousValue+currentValue;
       }),0);
@@ -78,6 +78,7 @@ class EncounterIntervalProbe extends EventEmitter{
    _initializeSamples(){
       let neighbors = this._node.getRandomSamplePointers();
       let size = Math.min(neighbors.length, this._sampleSize);
+      this.samples=[];
       for (let i=0;i<size;i++){
          let sample = {id: neighbors[i].id,encounters:[]};
          this.samples.push(sample);
