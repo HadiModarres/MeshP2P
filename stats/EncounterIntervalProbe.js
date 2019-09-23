@@ -26,8 +26,8 @@ class EncounterIntervalProbe extends EventEmitter{
       this._sampleSize = sampleSize;
       this._encounterCounts = encounterCounts;
       this.samples= []
-      this._gatherData();
       this.currentIndex= 0;
+      this._gatherData();
    }
 
    _gatherData(){
@@ -53,9 +53,11 @@ class EncounterIntervalProbe extends EventEmitter{
       }).reduce(((previousValue, currentValue) => {
         return previousValue+currentValue;
       }),0);
-      this.emit("stats",{sample_size: this._sampleSize,interval_count: this._encounterCounts,
-         total_avg: totalAvg,source_name: this._node.name});
+      let statsObj = {sample_size: this._sampleSize,interval_count: this._encounterCounts,
+         total_avg: totalAvg,source_name: this._node.name};
+      this.emit("stats",statsObj);
       this.currentIndex = 0;
+      console.info(statsObj);
    }
 
 
@@ -81,3 +83,5 @@ class EncounterIntervalProbe extends EventEmitter{
    };
 
 }
+
+module.exports = EncounterIntervalProbe;

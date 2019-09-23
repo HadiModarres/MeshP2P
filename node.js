@@ -11,6 +11,7 @@ let SearchResponder = require("./controllers/SearchResponder");
 let SearchRelay = require("./controllers/SearchRelay");
 const ListManager = require("./proximity/ListManager");
 let StatsRecorder = require("./stats/HTTPStatsRecorder");
+let IntervalProbe = require("./stats/EncounterIntervalProbe");
 
 
 const constants = require("./constants");
@@ -47,6 +48,7 @@ class Node {
         this.__initCyclonNode();
         this.__initSearchControllers();
         this.__addEventListeners();
+        this.intervalProbe = new IntervalProbe(this,1,4);
     }
 
     __addEventListeners(){
