@@ -3,7 +3,6 @@ let faker = require("faker");
 let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
 let stringSimilarity = require("string-similarity");
-let stats = require("./stats/StatsRecorder");
 
 
 
@@ -107,15 +106,9 @@ global.runTest = function () {
     // });
     let searchRequest = new SearchRequest(node, document.getElementById("new_name").value,"list#name");
     node.attachController(searchRequest);
-    stats.addEventEmitter(searchRequest);
+    node.statsRecorder.addEventEmitter(searchRequest);
     searchRequest.initiateSearch();
 };
-//
-// rtc.onChannel("data", function (data) {
-//     data.receive("data_type",10000).then((message)=>{
-//         console.info(message);
-//     });
-// });
 
 
 

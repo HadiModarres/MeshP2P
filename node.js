@@ -10,7 +10,7 @@ let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
 let SearchRelay = require("./controllers/SearchRelay");
 const ListManager = require("./proximity/ListManager");
-const stats = require("./stats/StatsRecorder");
+let StatsRecorder = require("./stats/HTTPStatsRecorder");
 
 
 const constants = require("./constants");
@@ -43,6 +43,7 @@ class Node {
         this.__controllers = [];
         this.listManager = new ListManager();
         this.name = '';
+        this.statsRecorder = new StatsRecorder();
         this.__initCyclonNode();
         this.__initSearchControllers();
         this.__addEventListeners();
@@ -50,7 +51,7 @@ class Node {
 
     __addEventListeners(){
         for (let c of this.__controllers) {
-            stats.addEventEmitter(c);
+            this.statsRecorder.addEventEmitter(c);
         }
     }
     /**
