@@ -32,3 +32,11 @@ Search Discard:
     id: search request id
     source_name: requesting node name
 }
+
+Encounter Interval:
+{
+    sample_size
+    interval_count
+    total_avg
+    source_name: requesting node name
+}

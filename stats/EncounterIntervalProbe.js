@@ -1,8 +1,9 @@
+const EventEmitter = require("events").EventEmitter;
 /**
  * Has the responsibility to gather and report number of shuffles between encounters of other nodes. This data
  * can possibly be used to measure network size.
  */
-class EncounterIntervalProbe {
+class EncounterIntervalProbe extends EventEmitter{
    get node() {
       return this._node;
    }
@@ -20,6 +21,7 @@ class EncounterIntervalProbe {
     * @param encounterCounts number of encounters to average and report at once
     */
    constructor(node,sampleSize,encounterCounts){
+      super();
       this._node = node;
       this._sampleSize = sampleSize;
       this._encounterCounts = encounterCounts;
@@ -30,21 +32,43 @@ class EncounterIntervalProbe {
 
    _gatherData(){
       this._node.__cyclonNode.on("neighbours_updated", ()=> {
-          if (this.currentIndex===0){
+         this.currentIndex++;
+          if (this.currentIndex===1){
              this._initializeSamples();
           }else{
              this._updateSamples();
              this._checkFinishCriteria();
           }
-          this.currentIndex++;
       });
    }
    _checkFinishCriteria(){
-
+      for (let sample of this.samples){
+         if (sample.encounters.length!== this._encounterCounts){
+            return false;
+         }
+      }
+      // all samples have gathered 3 encounters, finish criteria triggered
+      let totalAvg = this.samples.map((value)=>{
+         return (value.encounters[this._sampleSize-1]-value.encounters[0])/this._sampleSize;
+      }).reduce(((previousValue, currentValue) => {
+        return previousValue+currentValue;
+      }),0);
+      this.emit("stats",{sample_size: this._sampleSize,interval_count: this._encounterCounts,
+         total_avg: totalAvg,source_name: this._node.name});
+      this.currentIndex = 0;
    }
 
-   _updateSamples(){
 
+   _updateSamples(){
+      let neighbors = this._node.getRandomSamplePointers();
+      let neighborIds = neighbors.map((value)=>{
+         return value.id;
+      });
+      for (let sample of this.samples){
+         if (neighborIds.includes(sample.id)){
+            sample.encounters.push(this.currentIndex);
+         }
+      }
    }
 
    _initializeSamples(){
