@@ -26,18 +26,18 @@ class SearchRelay extends NodeController{
         if (n===1){
             return false;
         }else {
-            let bestProxList = this.node.listManager.proxListWithClosestRefToNeighbor(
-                {listEntry: packet[constants.PACKET_FIELD.QUERY], list: packet[constants.PACKET_FIELD.LIST]});
+            let bestProxList = this.node.listManager.proxListWithClosestRefToElement(
+                packet[constants.PACKET_FIELD.QUERY], packet[constants.PACKET_FIELD.LIST]);
             let randomEntries = this.node.__getRandomEntriesForList(packet[constants.PACKET_FIELD.LIST]);
             randomEntries = randomEntries.map((value => {
-                return {key:value.listEntry,value:value.pointer};
+                return {key:value.key,value:value.pointer};
             }));
             let allEntries = bestProxList.getAllElements().concat(randomEntries);
             let sortedList = bestProxList.sortListOnProximityToElement(allEntries, {key: packet[constants.PACKET_FIELD.QUERY]});
 
             // let nearNodes = bestProxList.nearestNodesTo({key:packet[constants.PACKET_FIELD.QUERY]}, n);
             let nearNodes = sortedList.slice(0, 2);
-            let refScore = bestProxList.scoreForElement({key: packet[constants.PACKET_FIELD.QUERY]});
+            let refScore = bestProxList.proximityScoreComparedToRef(packet[constants.PACKET_FIELD.QUERY]);
 
             nearNodes = nearNodes.filter((value) => {
                 if (value.score>refScore){

@@ -8,8 +8,10 @@ class HTTPStatsRecorder extends StatsRecorder{
         this.tagger = new StatsTagger();
     }
    __handleStats(statsObj) {
+       console.info(statsObj);
        this.tagger.tagStatsObj(statsObj);
-       this.sendStats(statsObj);
+       console.info(statsObj);
+       this.__sendStats(statsObj);
    }
 
     /**
@@ -17,7 +19,7 @@ class HTTPStatsRecorder extends StatsRecorder{
      * @param statsObj
      * @private
      */
-   sendStats(statsObj){
+   __sendStats(statsObj){
         let httpReq = new cyclonRtc.HttpRequestService();
         httpReq.get(statsObj.url).then((resolve)=>{
             // sent successfully
@@ -31,16 +33,16 @@ class HTTPStatsRecorder extends StatsRecorder{
    }
 }
 
-let sr = new HTTPStatsRecorder();
-let id = "3434";
-let source_name = "dd";
-let statsObj = {
-    id,
-    source_name,
-    event: 'start'
-};
-
-sr.__handleStats(statsObj);
+// let sr = new HTTPStatsRecorder();
+// let id = "3434";
+// let source_name = "dd";
+// let statsObj = {
+//     id,
+//     source_name,
+//     event: 'start'
+// };
+//
+// sr.__handleStats(statsObj);
 
 
 

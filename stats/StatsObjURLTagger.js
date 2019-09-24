@@ -11,6 +11,15 @@ class StatsObjURLTagger {
          case constants.EVENTS.SEARCH_START:
             this.__handleSearchReq(obj);
             break;
+         case constants.EVENTS.SEARCH_RESPOND:
+            this.__handleSearchRes(obj);
+            break;
+         case constants.EVENTS.SEARCH_DISCARDED:
+            this.__handleSearchDiscard(obj);
+            break;
+         case constants.EVENTS.SEARCH_REVISITED:
+            this.__handleSearchRevisit(obj);
+            break;
 
       }
    }

@@ -28,7 +28,7 @@ class ProximityList {
 
     perfectMatchForElement(key) {
         for (let e of [this.referenceElement, ...this.list]) {
-            if (JSON.stringify(e.key) === JSON.stringify(element.key)) {
+            if (JSON.stringify(e.key) === JSON.stringify(key)) {
                 return e;
             }
         }
@@ -42,7 +42,7 @@ class ProximityList {
      */
     sortListOnProximityToElement(extList, extElem) {
         for (let elem of extList) {
-            let score = this.proximityFunc(elem, extElem);
+            let score = this.proximityFunc(elem.key, extElem.key);
             elem.score = score;
         }
         return extList.sort((a, b) => {

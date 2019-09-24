@@ -122,7 +122,7 @@ class ListManager {
         let bestProxList = undefined;
         let bestScore = Number.NEGATIVE_INFINITY;
         for (let proxList of proxLists){
-            let score = proxList.scoreForElement({key});
+            let score = proxList.proximityScoreComparedToRef(key);
             if (score>bestScore){
                 bestScore = score;
                 bestProxList = proxList;
