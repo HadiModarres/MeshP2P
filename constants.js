@@ -19,6 +19,7 @@ module.exports.EVENTS = {
    SEARCH_RELAY: 'relay',
    SEARCH_DISCARDED: 'discard',
    SEARCH_REVISITED: 'revisit',
+   SEARCH_RESPOND: 'respond',
 };
 
 module.exports.STATS_RECORDER = {
@@ -27,4 +28,4 @@ module.exports.STATS_RECORDER = {
 };
 
 module.exports.STATS_FILE_PATH = './stats.txt';
-module.exports.STATS_HTTP_URL = "http://localhost:3500/stats/";
+module.exports.STATS_HTTP_URL = "http://localhost:3500/stats";

@@ -1,7 +1,10 @@
 Standard for emitted stats objects:
 
+event: constants -> EVENTS enum
+
 Search Request:
 {
+    event
     id: search request id
     source_name: requesting node name
     query: search query
@@ -10,6 +13,7 @@ Search Request:
 
 Search Relay:
 {
+    event
     id: search request id
     source_name: requesting node name
 }
@@ -17,24 +21,28 @@ Search Relay:
 
 Search Response:
 {
+    event
     id: search request id
     source_name: requesting node name
 }
 
 Search Discard:
 {
+    event
     id: search request id
     source_name: requesting node name
 }
 
-Search Discard:
+Search Revisit:
 {
+    event
     id: search request id
     source_name: requesting node name
 }
 
 Encounter Interval:
 {
+    event
     sample_size
     interval_count
     total_avg

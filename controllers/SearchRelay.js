@@ -49,8 +49,11 @@ class SearchRelay extends NodeController{
 
             console.info("near nodes: ");
             console.info(nearNodes);
-            let httpReq = new cyclonRtc.HttpRequestService();
-            httpReq.get(`http://localhost:3500/stats/search_relayed?id=${packet[constants.PACKET_FIELD.PACKET_ID]}&node_name=${this.node.name}`);
+            let stats_obj = {event:constants.EVENTS.SEARCH_RELAY,id:packet[constants.PACKET_FIELD.PACKET_ID],
+                source_name:this.node.name};
+            this.emit("stats", stats_obj);
+            // let httpReq = new cyclonRtc.HttpRequestService();
+            // httpReq.get(`http://localhost:3500/stats/search_relayed?id=${packet[constants.PACKET_FIELD.PACKET_ID]}&node_name=${this.node.name}`);
             for (let node of nearNodes) {
                 this.sendOutPacket(packet, node.value);
             }

@@ -23,7 +23,10 @@ class SearchRequest extends NodeController{
       packet[constants.PACKET_FIELD.QUERY]= this.searchTerm;
       packet[constants.PACKET_FIELD.LIST]= this.list;
 
-      this.emit("stats", constants.EVENTS.SEARCH_START, this.id, this.node.name, this.searchTerm, neighborIds.length);
+      let stats_obj = {event:constants.EVENTS.SEARCH_START,id:this.id,
+         source_name:this.node.name,query:this.searchTerm };
+      this.emit("stats", stats_obj);
+      // this.emit("stats", constants.EVENTS.SEARCH_START, this.id, this.node.name, this.searchTerm, neighborIds.length);
       for(let neighborId of neighborIds) {
          this.sendOutPacket(packet, neighborId);
 

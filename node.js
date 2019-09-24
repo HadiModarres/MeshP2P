@@ -12,6 +12,7 @@ let SearchRelay = require("./controllers/SearchRelay");
 const ListManager = require("./proximity/ListManager");
 let StatsRecorder = require("./stats/HTTPStatsRecorder");
 let IntervalProbe = require("./stats/EncounterIntervalProbe");
+var EventEmitter = require("events").EventEmitter;
 
 
 const constants = require("./constants");
@@ -39,15 +40,16 @@ var DEFAULT_ICE_SERVERS = [
 var DEFAULT_CHANNEL_STATE_TIMEOUT_MS = 30000;
 var DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS = 5000;
 
-class Node {
+class Node extends EventEmitter{
     constructor() {
+        super();
         this.__controllers = [];
         this.listManager = new ListManager();
         this.name = '';
-        // this.statsRecorder = new StatsRecorder();
+        this.statsRecorder = new StatsRecorder();
         this.__initCyclonNode();
         this.__initSearchControllers();
-        // this.__addEventListeners();
+        this.__addEventListeners();
         this.intervalProbe = new IntervalProbe(this,1,4);
     }
 
@@ -55,6 +57,7 @@ class Node {
         for (let c of this.__controllers) {
             this.statsRecorder.addEventEmitter(c);
         }
+        this.statsRecorder.addEventEmitter(this);
     }
     /**
      * Register a global list on this node
@@ -267,8 +270,10 @@ class Node {
             if (controller.handlePacket(packet))
                 return;
         }
-        let httpReq = new cyclonRtc.HttpRequestService();
-        httpReq.get(`http://localhost:3500/stats/search_discarded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}&node_name=${this.name}`);
+        let stats_obj = {event:constants.EVENTS.SEARCH_DISCARDED,id:packet[constants.PACKET_FIELD.PACKET_ID],source_name:this.name};
+        this.emit("stats", stats_obj);
+        // let httpReq = new cyclonRtc.HttpRequestService();
+        // httpReq.get(`http://localhost:3500/stats/search_discarded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}&node_name=${this.name}`);
     }
 
     /**

@@ -5,11 +5,11 @@ let cyclonRtc = require('cyclon.p2p-rtc-client');
 class HTTPStatsRecorder extends StatsRecorder{
     constructor(){
         super();
-        this.tagger = new StatsTagger;
+        this.tagger = new StatsTagger();
     }
    __handleStats(statsObj) {
        this.tagger.tagStatsObj(statsObj);
-       let a = [];
+       this.sendStats(statsObj);
    }
 
     /**
@@ -17,10 +17,11 @@ class HTTPStatsRecorder extends StatsRecorder{
      * @param statsObj
      * @private
      */
-   __sendStats(statsObj){
+   sendStats(statsObj){
         let httpReq = new cyclonRtc.HttpRequestService();
         httpReq.get(statsObj.url).then((resolve)=>{
             // sent successfully
+            console.info("sent");
         },(reject)=>{
             // couldnt send save for later
             console.error("couldnt send stats obj to url: "+statsObj.url);
@@ -28,5 +29,19 @@ class HTTPStatsRecorder extends StatsRecorder{
             this.eventsBacklog.push(statsObj);
         });
    }
-
 }
+
+let sr = new HTTPStatsRecorder();
+let id = "3434";
+let source_name = "dd";
+let statsObj = {
+    id,
+    source_name,
+    event: 'start'
+};
+
+sr.__handleStats(statsObj);
+
+
+
+module.exports = HTTPStatsRecorder;
