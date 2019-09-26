@@ -48,3 +48,20 @@ Encounter Interval:
     total_avg
     source_name: requesting node name
 }
+
+Node Stats:
+{
+    id: node name,
+    neighbors: [node_name] : array of other neighbor names,
+    shuffles: shuffle count
+    timeouts: timeout count
+    errors: error count
+    enc_interval: encounter interval total average
+}
+
+
+Proximity List Changed:
+{
+    event
+    source_name
+}

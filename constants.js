@@ -20,6 +20,9 @@ module.exports.EVENTS = {
    SEARCH_DISCARDED: 'discard',
    SEARCH_REVISITED: 'revisit',
    SEARCH_RESPOND: 'respond',
+   PROX_LINK_CHANGED: 'prox_change',
+   NODE_STATS: 'node_stats',
+   ENC_INTERVAL: 'enc_interval'
 };
 
 module.exports.STATS_RECORDER = {

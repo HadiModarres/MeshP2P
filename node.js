@@ -11,8 +11,8 @@ let SearchResponder = require("./controllers/SearchResponder");
 let SearchRelay = require("./controllers/SearchRelay");
 const ListManager = require("./proximity/ListManager");
 let StatsRecorder = require("./stats/HTTPStatsRecorder");
-let IntervalProbe = require("./stats/EncounterIntervalProbe");
 var EventEmitter = require("events").EventEmitter;
+let NodeStatsProbe = require("./stats/NodeStatsProbe");
 
 
 const constants = require("./constants");
@@ -48,9 +48,9 @@ class Node extends EventEmitter{
         this.name = '';
         this.statsRecorder = new StatsRecorder();
         this.__initCyclonNode();
+        this.statsProbe= new NodeStatsProbe(this,4000);
         this.__initSearchControllers();
         this.__addEventListeners();
-        this.intervalProbe = new IntervalProbe(this,1,4);
     }
 
     __addEventListeners(){
@@ -58,6 +58,7 @@ class Node extends EventEmitter{
             this.statsRecorder.addEventEmitter(c);
         }
         this.statsRecorder.addEventEmitter(this);
+        this.statsRecorder.addEventEmitter(this.statsProbe);
     }
     /**
      * Register a global list on this node
@@ -148,14 +149,14 @@ class Node extends EventEmitter{
 // level 0
 
         this.__cyclonNode = cyclon.builder(this.comms, this.bootStrap)
-            .withNumNeighbours(12)
+            .withNumNeighbours(120)
             .withMetadataProviders({
                     "clientInfo": () => {
                         return this.listManager.getAllLocalEntries();
                     },
                 }
             )
-            .withShuffleSize(5)
+            .withShuffleSize(120)
             .withTickIntervalMs(20000)
             .build();
 
@@ -235,9 +236,7 @@ class Node extends EventEmitter{
     }
 
     __sendNeighborsToStatsServer(){
-
         let httpReq = new cyclonRtc.HttpRequestService();
-
         let proxList = this.listManager.getAllProximityLists("list#name")[0];
         let neighbors = proxList.getAllElements();
         neighbors = neighbors.map((value) => {
@@ -246,7 +245,6 @@ class Node extends EventEmitter{
 
         let localEntry = this.listManager.getAllLocalEntries()[0].key;
         httpReq.get(`http://localhost:3500/stats/neighbors_updated?json={"id":"${localEntry}","neighbors":[${neighbors}]}`);
-
     }
 
 

@@ -1,4 +1,5 @@
 const EventEmitter = require("events").EventEmitter;
+let constants = require("../constants");
 /**
  * Has the responsibility to gather and report number of shuffles between encounters of other nodes. This data
  * can possibly be used to measure network size.

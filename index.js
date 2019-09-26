@@ -22,6 +22,7 @@ node.registerList("list#name", (a, b) =>{
 });
 node.setEntries("list#name", [name]);
 node.name= name;
+window.document.title = name;
 node.startNode();
 
 

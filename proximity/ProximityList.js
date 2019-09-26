@@ -1,8 +1,11 @@
+const EventEmitter = require("events").EventEmitter;
+const constants = require("../constants");
+var cyclonRtc = require('cyclon.p2p-rtc-client');
 /**
  * Maintains a list of most similar items to a given reference element, the similarity between elements is determined
  * by the proximity function (a,b) => c, higher values of c mean that a and b are more similar
  */
-class ProximityList {
+class ProximityList extends EventEmitter{
     /**
      *
      * @param maximumListSize
@@ -10,6 +13,7 @@ class ProximityList {
      * @param proximityFunc (a,b) => float n,  0<n<1
      */
     constructor(maximumListSize, referenceElement, proximityFunc) {
+        super();
         this.list = [];
         this.maximumListSize = maximumListSize;
         this.proximityFunc = proximityFunc;
@@ -110,13 +114,16 @@ class ProximityList {
      * @private
      */
     _putElement(element) {
+        let httpReq = new cyclonRtc.HttpRequestService();
         for (let i = 0; i < this.list.length; i++) {
             if (this.list[i].proximityScore < element.proximityScore) {
+                httpReq.get(`http://localhost:3500/stats/link_changed`);
                 this.list.splice(i, 0, element);
-                return;
+                return true;
             }
         }
         this.list.push(element);
+        return false;
     }
 
     getAllElements() {

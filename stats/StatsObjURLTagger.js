@@ -20,8 +20,16 @@ class StatsObjURLTagger {
          case constants.EVENTS.SEARCH_REVISITED:
             this.__handleSearchRevisit(obj);
             break;
+         case constants.EVENTS.NODE_STATS:
+            this.__handleNodeStats(obj);
+            break;
 
       }
+   }
+
+   __handleNodeStats(obj){
+      let url =  `${constants.STATS_HTTP_URL}/node_stats?json=${JSON.stringify(obj)}`;
+      obj.url = url;
    }
    __handleSearchReq(obj){
       let url =  `${constants.STATS_HTTP_URL}/search_started?id=${obj.id}&source_name=${obj.source_name}&query=${obj.query}`;

@@ -24,5 +24,7 @@ class Test {
 }
 
 // new Test().test();
-let a=undefined;
-console.log(2/3);
+let a = [3,2,7,0];
+a.splice(1, 0, 80);
+console.log(a);
+console.log(a.slice(0, a.length));

@@ -5,7 +5,7 @@ let ProximityList = require("./ProximityList");
  */
 class ListManager {
     constructor() {
-        this.proximityListSize = 5;
+        this.proximityListSize = 4;
         this.lists = [];
 
     }
@@ -94,7 +94,6 @@ class ListManager {
     getAllProximityLists(globalList) {
         let list = this.getGlobalList(globalList);
         if (!list) {
-            console.warn(`tried to add entry ${entry} to non-existent global list: ${globalList}`);
             return undefined;
         }
         return list.lists;
