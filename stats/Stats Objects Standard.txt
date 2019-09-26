@@ -16,6 +16,7 @@ Search Relay:
     event
     id: search request id
     source_name: requesting node name
+    target_name: target node name
 }
 
 

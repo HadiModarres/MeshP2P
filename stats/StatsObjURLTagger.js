@@ -40,7 +40,7 @@ class StatsObjURLTagger {
       obj.url = url;
    }
    __handleSearchRelay(obj){
-      let url =  `${constants.STATS_HTTP_URL}/search_relayed?id=${obj.id}&node_name=${obj.source_name}`;
+      let url =  `${constants.STATS_HTTP_URL}/search_relayed?id=${obj.id}&node_name=${obj.source_name}&target_name=${obj.target_name}`;
       obj.url = url;
    }
    __handleSearchDiscard(obj){

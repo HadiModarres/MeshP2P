@@ -149,14 +149,14 @@ class Node extends EventEmitter{
 // level 0
 
         this.__cyclonNode = cyclon.builder(this.comms, this.bootStrap)
-            .withNumNeighbours(120)
+            .withNumNeighbours(10)
             .withMetadataProviders({
                     "clientInfo": () => {
                         return this.listManager.getAllLocalEntries();
                     },
                 }
             )
-            .withShuffleSize(120)
+            .withShuffleSize(4)
             .withTickIntervalMs(20000)
             .build();
 
@@ -243,8 +243,8 @@ class Node extends EventEmitter{
             return `"${value.key}"`;
         });
 
-        let localEntry = this.listManager.getAllLocalEntries()[0].key;
-        httpReq.get(`http://localhost:3500/stats/neighbors_updated?json={"id":"${localEntry}","neighbors":[${neighbors}]}`);
+        // let localEntry = this.listManager.getAllLocalEntries()[0].key;
+        // httpReq.get(`http://localhost:3500/stats/neighbors_updated?json={"id":"${localEntry}","neighbors":[${neighbors}]}`);
     }
 
 
