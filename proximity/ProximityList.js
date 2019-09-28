@@ -86,7 +86,7 @@ class ProximityList extends EventEmitter{
             // bad element -> no key
             throw Error("Proximity List: element to be added should have a key");
         }
-        element.proximityScore = this.proximityFunc(this.referenceElement.key, element.key);
+        element.proximityScore = this.proximityFunc(this.referenceElement.key, element.key).toFixed(3);
         this._putElement(element);
         this.list = this.list.slice(0, this.maximumListSize);
     }
