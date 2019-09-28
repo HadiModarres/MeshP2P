@@ -23,8 +23,18 @@ class Test {
    }
 }
 
+// console.log(new Date().getTime()/1000);
+
+let a = new Date().getTime()/1000;
+
+console.log(1569569502.117 -1569569499.472 >1 );
+console.log(5.007999897003174 - 1> 1);
+setTimeout(()=>{
+   console.log((new Date().getTime()/1000)-a);
+},5000);
+
 // new Test().test();
-let a = [3,2,7,0];
-a.splice(1, 0, 80);
-console.log(a);
-console.log(a.slice(0, a.length));
+// let a = [3,2,7,0];
+// a.splice(1, 0, 80);
+// console.log(a);
+// console.log(a.slice(0, a.length));

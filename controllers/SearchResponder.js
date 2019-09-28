@@ -42,7 +42,7 @@ class SearchResponder extends NodeController{
     __responseForPacket(packet){
         let proxLists = this.node.listManager.getAllProximityLists(packet[constants.PACKET_FIELD.LIST]);
         for (let proxList of proxLists){
-            let match = proxList.perfectMatchForElement({key:packet[constants.PACKET_FIELD.QUERY]});
+            let match = proxList.perfectMatchForElement(packet[constants.PACKET_FIELD.QUERY]);
             if(match){
                 return match;
             }
