@@ -1,16 +1,15 @@
 'use strict';
 
-var Utils = require("cyclon.p2p-common");
-var Promise = require("bluebird");
+const Utils = require("cyclon.p2p-common");
+const Promise = require("bluebird");
 
 function IncomingShuffleState(localNode, sourcePointer, asyncExecService, logger) {
 
     Utils.checkArguments(arguments, 4);
 
-    var SHUFFLE_REQUEST_TIMEOUT_MS = 15000;
-    var SHUFFLE_RESPONSE_ACKNOWLEDGEMENT_TIMEOUT_MS = 15000;
-    var lastOutstandingPromise = null;
-    var responseSendingTimeoutId = null;
+    const SHUFFLE_REQUEST_TIMEOUT_MS = 15000;
+    const SHUFFLE_RESPONSE_ACKNOWLEDGEMENT_TIMEOUT_MS = 15000;
+    let lastOutstandingPromise = null;
 
     /**
      * Receive an inbound shuffle
@@ -21,25 +20,12 @@ function IncomingShuffleState(localNode, sourcePointer, asyncExecService, logger
 
         lastOutstandingPromise = channel.receive("shuffleRequest", SHUFFLE_REQUEST_TIMEOUT_MS)
             .then(function (shuffleRequestMessage) {
-                return new Promise(function (resolve) {
-                    logger.debug("Received shuffle request from " + sourcePointer.id + " : " + JSON.stringify(shuffleRequestMessage));
-                    var response = localNode.handleShuffleRequest(sourcePointer, shuffleRequestMessage);
-
-                    //
-                    // Not sure why but responses seem to send more reliably with a small delay
-                    // between receiving the request and sending the response. Without this
-                    // the sender sometimes reports they never got the response!?
-                    //
-                    responseSendingTimeoutId = asyncExecService.setTimeout(function () {
-                        channel.send("shuffleResponse", response);
-                        logger.debug("Sent shuffle response to " + sourcePointer.id);
-                        resolve(channel);
-                    }, 10);
-                })
-            }).cancellable().catch(Promise.CancellationError, function (e) {
-                asyncExecService.clearTimeout(responseSendingTimeoutId);
-                throw e;
-            });
+                logger.debug("Received shuffle request from " + sourcePointer.id + " : " + JSON.stringify(shuffleRequestMessage));
+                const response = localNode.handleShuffleRequest(sourcePointer, shuffleRequestMessage);
+                channel.send("shuffleResponse", response);
+                logger.debug("Sent shuffle response to " + sourcePointer.id);
+                return channel;
+            }).cancellable();
 
         return lastOutstandingPromise;
     };
@@ -63,7 +49,6 @@ function IncomingShuffleState(localNode, sourcePointer, asyncExecService, logger
      * Cleanup any resources
      */
     this.close = function () {
-        asyncExecService.clearTimeout(responseSendingTimeoutId);
         lastOutstandingPromise = null;
         localNode = null;
         sourcePointer = null;

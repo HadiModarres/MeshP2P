@@ -1,17 +1,17 @@
 'use strict';
 
-var Promise = require("bluebird");
-var Utils = require("cyclon.p2p-common");
+const Promise = require("bluebird");
+const Utils = require("cyclon.p2p-common");
 
 function OutgoingShuffleState(fromNode, destinationNodePointer, shuffleSet, asyncExecService, logger) {
 
     Utils.checkArguments(arguments, 5);
 
-    var SHUFFLE_RESPONSE_TIMEOUT_MS = 30000;
-    var lastOutstandingPromise = null;
-    var channelClosingTimeoutId = null;
-    var sendingRequestTimeoutId = null;
-    var channel = null;
+    const SHUFFLE_RESPONSE_TIMEOUT_MS = 30000;
+    let lastOutstandingPromise = null;
+    let channelClosingTimeoutId = null;
+    let sendingRequestTimeoutId = null;
+    let channel = null;
 
     /**
      * Store the channel for later use
@@ -27,28 +27,8 @@ function OutgoingShuffleState(fromNode, destinationNodePointer, shuffleSet, asyn
      */
     this.sendShuffleRequest = function () {
         checkThatChannelIsSet();
-
-        lastOutstandingPromise = new Promise(function (resolve) {
-
-            /**
-             * We need to delay the sending of the request because the messages seem to go missing when sent
-             * immediately on the RTCDataChannel.onopen event, and even seem a bit flaky when only a short
-             * delay (e.g. 1ms) is implemented. Not sure how long we need to wait, but 1 second seems
-             * to reduce the number of lost messages to a negligible level.
-             */
-            sendingRequestTimeoutId = asyncExecService.setTimeout(function () {
-                channel.send("shuffleRequest", shuffleSet);
-                logger.debug("Sent shuffle request to " + destinationNodePointer.id + " : " + JSON.stringify(shuffleSet));
-                resolve();
-            }, 1000);
-        })
-        .cancellable()
-        .catch(Promise.CancellationError, function (e) {
-            asyncExecService.clearTimeout(sendingRequestTimeoutId);
-            throw e;
-        });
-
-        return lastOutstandingPromise;
+        channel.send("shuffleRequest", shuffleSet);
+        logger.debug("Sent shuffle request to " + destinationNodePointer.id + " : " + JSON.stringify(shuffleSet));
     };
 
     /**

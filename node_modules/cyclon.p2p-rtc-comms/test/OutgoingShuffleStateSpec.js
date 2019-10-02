@@ -1,27 +1,26 @@
 'use strict';
 
-var Promise = require("bluebird");
-var OutgoingShuffleState = require("../lib/OutgoingShuffleState");
-var ClientMocks = require("./ClientMocks");
+const Promise = require("bluebird");
+const OutgoingShuffleState = require("../lib/OutgoingShuffleState");
+const ClientMocks = require("./ClientMocks");
 
 describe("The Outgoing ShuffleState", function () {
 
-    var TIMEOUT_ID = 12345;
-    var SHUFFLE_SET = ["a", "b", "c"];
-    var DESTINATION_NODE_POINTER = {
+    const TIMEOUT_ID = 12345;
+    const SHUFFLE_SET = ["a", "b", "c"];
+    const DESTINATION_NODE_POINTER = {
         id: "OTHER_NODE_ID"
     };
-    var RESPONSE_PAYLOAD = "RESPONSE_PAYLOAD";
-    var LOCAL_SESSION_DESCRIPTION = "LOCAL_SESSION_DESCRIPTION";
+    const RESPONSE_PAYLOAD = "RESPONSE_PAYLOAD";
 
-    var localCyclonNode,
+    let localCyclonNode,
         asyncExecService,
         loggingService,
         channel;
 
-    var successCallback, failureCallback;
+    let successCallback, failureCallback;
 
-    var outgoingShuffleState;
+    let outgoingShuffleState;
 
     beforeEach(function () {
         successCallback = ClientMocks.createSuccessCallback();
@@ -48,29 +47,12 @@ describe("The Outgoing ShuffleState", function () {
 
         describe("when sending a shuffle request", function () {
 
-            describe("and everything succeeds", function () {
-                beforeEach(function (done) {
-                    asyncExecService.setTimeout.and.callFake(function (callback) {
-                        callback();
-                    });
-                    outgoingShuffleState.sendShuffleRequest().then(done);
-                });
-
-                it("should set a timeout to send the message over the data channel", function () {
-                    expect(channel.send).toHaveBeenCalledWith("shuffleRequest", SHUFFLE_SET);
-                });
+            beforeEach(function () {
+                outgoingShuffleState.sendShuffleRequest();
             });
 
-            describe("and cancel is called before the request is sent", function () {
-                beforeEach(function (done) {
-                    outgoingShuffleState.sendShuffleRequest()
-                        .catch(Promise.CancellationError, done)
-                        .cancel();
-                });
-
-                it("clears the send request timeout", function () {
-                    expect(asyncExecService.clearTimeout).toHaveBeenCalledWith(TIMEOUT_ID);
-                });
+            it("should send the message over the data channel", function () {
+                expect(channel.send).toHaveBeenCalledWith("shuffleRequest", SHUFFLE_SET);
             });
         });
 
@@ -132,21 +114,13 @@ describe("The Outgoing ShuffleState", function () {
 
         describe("when closing", function() {
 
-            var sendingRequestTimeoutId = "sendingRequestTimeoutId";
-            var channelClosingTimeoutId = "channelClosingTimeoutId";
+            let channelClosingTimeoutId = "channelClosingTimeoutId";
 
             beforeEach(function() {
-                asyncExecService.setTimeout.and.returnValue(sendingRequestTimeoutId);
-                outgoingShuffleState.sendShuffleRequest();
-
                 asyncExecService.setTimeout.and.returnValue(channelClosingTimeoutId);
                 outgoingShuffleState.sendResponseAcknowledgement();
 
                 outgoingShuffleState.close();
-            });
-
-            it("clears the sending request timeout", function() {
-                expect(asyncExecService.clearTimeout).toHaveBeenCalledWith(sendingRequestTimeoutId);
             });
 
             it("clears the channel closing timeout", function() {
@@ -156,7 +130,7 @@ describe("The Outgoing ShuffleState", function () {
 
         describe("when cancelling", function() {
 
-            var lastOutstandingPromise;
+            let lastOutstandingPromise;
 
             beforeEach(function() {
                 lastOutstandingPromise = ClientMocks.mockPromise();

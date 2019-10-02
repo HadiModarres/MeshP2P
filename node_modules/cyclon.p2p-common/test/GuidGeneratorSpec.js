@@ -1,6 +1,6 @@
 'use strict';
 
-var GuidGenerator = require("../lib/GuidGenerator");
+const { GuidGenerator } = require("../lib/GuidGenerator");
 
 describe("The GuidGenerator", function() {
 

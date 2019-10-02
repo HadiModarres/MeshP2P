@@ -136,7 +136,7 @@ class Node extends EventEmitter{
 //level 2
         let iceCandidateBatchingSignalling = new cyclonRtc.IceCandidateBatchingSignallingService(Utils.asyncExecService(),
             signallingService, DEFAULT_BATCHING_DELAY_MS);
-        let channelFactory = new cyclonRtc.ChannelFactory(peerConnectionFactory, iceCandidateBatchingSignalling, logger);
+        let channelFactory = new cyclonRtc.ChannelFactory(peerConnectionFactory, iceCandidateBatchingSignalling, logger,DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
         let shuffleStateFactory = new cyclonRtcComms.ShuffleStateFactory(logger, Utils.asyncExecService());
 
 
@@ -149,14 +149,14 @@ class Node extends EventEmitter{
 // level 0
 
         this.__cyclonNode = cyclon.builder(this.comms, this.bootStrap)
-            .withNumNeighbours(10)
+            .withNumNeighbours(400)
             .withMetadataProviders({
                     "clientInfo": () => {
                         return this.listManager.getAllLocalEntries();
                     },
                 }
             )
-            .withShuffleSize(4)
+            .withShuffleSize(400)
             .withTickIntervalMs(20000)
             .build();
 
@@ -212,7 +212,7 @@ class Node extends EventEmitter{
     }
 
     __setupHandlerForNewNeighborSet(){
-        this.__cyclonNode.on("neighbours_updated", ()=> {
+        this.__cyclonNode.on("shuffleCompleted", (direction,pointer)=> {
             let pointerSet = this.getRandomSamplePointers();
             let entries = this.__extractListEntriesFromPointers(pointerSet);
             this.__incorporateNeighbourList(entries);

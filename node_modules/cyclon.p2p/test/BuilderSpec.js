@@ -14,7 +14,7 @@ describe("The cyclon-lib export", function() {
     });
 
 	it("exports a builder function", function() {
-		expect(cyclon.builder).toEqual(any(Function));
+		expect(cyclon.builder).toEqual(jasmine.any(Function));
 	});
 
 	describe("the builder", function() {
