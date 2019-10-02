@@ -6,7 +6,7 @@ class SearchRelay extends NodeController{
     constructor(node){
         super(node);
         this.handledPacketIds = [];
-        this.maximumHops = 4;
+        this.maximumHops = 5;
     }
     handlePacket(packet){
         console.info("testing relay");
@@ -26,20 +26,38 @@ class SearchRelay extends NodeController{
         if (n===1){
             return false;
         }else {
-            let elem = {
-                "metadata": {
-                    "clientInfo": packet[constants.PACKET_FIELD.QUERY]
-                }};
-            let nearNodes = this.node.proximityList.NearestNodesTo(elem, n);
-            let httpReq = new cyclonRtc.HttpRequestService();
-            httpReq.get(`http://localhost:3000/stats/search_relayed?id=${packet[constants.PACKET_FIELD.PACKET_ID]}`);
+            let bestProxList = this.node.listManager.proxListWithClosestRefToElement(
+                packet[constants.PACKET_FIELD.QUERY], packet[constants.PACKET_FIELD.LIST]);
+            let randomEntries = this.node.__getRandomEntriesForList(packet[constants.PACKET_FIELD.LIST]);
+            randomEntries = randomEntries.map((value => {
+                return {key:value.key,value:value.pointer};
+            }));
+            let allEntries = bestProxList.getAllElements().concat(randomEntries);
+            let sortedList = bestProxList.sortListOnProximityToElement(allEntries, {key: packet[constants.PACKET_FIELD.QUERY]});
+
+            // let nearNodes = bestProxList.nearestNodesTo({key:packet[constants.PACKET_FIELD.QUERY]}, n);
+            let nearNodes = sortedList.slice(0, 2);
+            let refScore = bestProxList.proximityScoreComparedToRef(packet[constants.PACKET_FIELD.QUERY]);
+
+            nearNodes = nearNodes.filter((value) => {
+                if (value.score>refScore){
+                    return true;
+                }else{
+                    return false;
+                }
+            });
+
+            console.info("near nodes: ");
+            console.info(nearNodes);
+            // let httpReq = new cyclonRtc.HttpRequestService();
+            // httpReq.get(`http://localhost:3500/stats/search_relayed?id=${packet[constants.PACKET_FIELD.PACKET_ID]}&node_name=${this.node.name}`);
             for (let node of nearNodes) {
-                this.sendOutPacket(packet, node).then((value => {
-                    console.info("relayed search request");
-                }),(reason => {
-                    console.info("couldnt relay request");
-                }));
+                let stats_obj = {event:constants.EVENTS.SEARCH_RELAY,id:packet[constants.PACKET_FIELD.PACKET_ID],
+                    source_name:this.node.name,target_name: node.key};
+                this.emit("stats", stats_obj);
+                this.sendOutPacket(packet, node.value);
             }
+            return true;
         }
     }
 }

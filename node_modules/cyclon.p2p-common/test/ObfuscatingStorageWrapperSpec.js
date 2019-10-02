@@ -1,7 +1,7 @@
 'use strict';
 
-var ObfuscatingStorageWrapper = require("../lib/ObfuscatingStorageWrapper");
-var InMemoryStorage = require("../lib/InMemoryStorage");
+const { ObfuscatingStorageWrapper } = require("../lib/ObfuscatingStorageWrapper");
+const { InMemoryStorage } = require("../lib/InMemoryStorage");
 
 describe("The tamper-resistant storage wrapper", function () {
 

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha 'test/*' || true",
     "build": "browserify index.js -o bundle.js"
   },
   "keywords": [],
@@ -13,13 +13,16 @@
   "dependencies": {
     "angular": "^1.7.8",
     "browserify": "^16.5.0",
-    "cyclon.p2p": "^0.1.10",
-    "cyclon.p2p-common": "0.0.6",
-    "cyclon.p2p-rtc-client": "^0.1.22",
-    "cyclon.p2p-rtc-comms": "^0.1.23",
+    "chai": "^4.2.0",
+    "cyclon.p2p": "^0.1.12",
+    "cyclon.p2p-common": "^0.1.7",
+    "cyclon.p2p-rtc-client": "^0.1.31",
+    "cyclon.p2p-rtc-comms": "^0.1.30",
     "faker": "^4.1.0",
+    "mocha": "^6.2.1",
     "string-similarity": "^3.0.0",
     "uuid": "^3.3.3",
+    "watchify": "^3.11.1",
     "webrtc-adapter": "^7.3.0"
   }
 }

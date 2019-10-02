@@ -1,5 +1,11 @@
-let stringSimilarity = require("string-similarity");
-class ProximityList {
+const EventEmitter = require("events").EventEmitter;
+const constants = require("../constants");
+var cyclonRtc = require('cyclon.p2p-rtc-client');
+/**
+ * Maintains a list of most similar items to a given reference element, the similarity between elements is determined
+ * by the proximity function (a,b) => c, higher values of c mean that a and b are more similar
+ */
+class ProximityList extends EventEmitter{
     /**
      *
      * @param maximumListSize
@@ -7,113 +13,135 @@ class ProximityList {
      * @param proximityFunc (a,b) => float n,  0<n<1
      */
     constructor(maximumListSize, referenceElement, proximityFunc) {
+        super();
         this.list = [];
         this.maximumListSize = maximumListSize;
         this.proximityFunc = proximityFunc;
         this.referenceElement = referenceElement;
-        this.compareFunc = undefined;
     }
 
-    uniqueElements(compareFunc){
-       this.compareFunc = compareFunc;
+    /**
+     * get proximity score for the given key in relation to this list's reference element's key
+     * @param key
+     * @return {*}
+     */
+    proximityScoreComparedToRef(key) {
+        return this.proximityFunc(this.referenceElement.key, key);
     }
 
-    perfectMatchForElement(element){
-        if (this.proximityFunc(this.referenceElement,element)===1){
-            return this.referenceElement;
-        }
-        for (let e of this.list) {
-            if (this.proximityFunc(e,element)===1){
+
+    perfectMatchForElement(key) {
+        for (let e of [this.referenceElement, ...this.list]) {
+            if (JSON.stringify(e.key) === JSON.stringify(key)) {
                 return e;
             }
         }
         return undefined;
     }
 
-    NearestNodesTo(element,count){
-        let ind=-1;
-        let score = this.proximityFunc(this.referenceElement, element);
-        for (let i=0;i<this.list.length;i++){
-            if (score>this.list[i].proximityScore){
-                ind = i;
+    /**
+     * Sorts a list of external elements according to how close they are to external element
+     * @param extList
+     * @param extElem
+     */
+    sortListOnProximityToElement(extList, extElem) {
+        for (let elem of extList) {
+            let score = this.proximityFunc(elem.key, extElem.key);
+            elem.score = score;
+        }
+        return extList.sort((a, b) => {
+            if (a.score > b.score) {
+                return -1;
+            } else if (a.score === b.score) {
+                return 0;
+            } else {
+                return 1;
             }
-        }
-        if (ind===-1){
-            return [];
-        }else{
-            return this.list.slice(ind - (count / 2), count);
-        }
+        });
     }
 
-    /**
-     * @return {Boolean} true if list was changed, false if list remained unchanged
-     */
-    addElement(element){
-        if (this.compareFunc){
-            this._filterList(element);
-        }
-        element.proximityScore = this.proximityFunc(this.referenceElement, element);
-        this._putElement(element);
-        this.list = this.list.slice(0, this.maximumListSize);
-    }
-    _filterList(element){
-        this.list = this.list.filter((value => {
-            return (!this.compareFunc(element,value));
+
+    nearestNodesTo(element, count) {
+        let scores = this.list.map((value => {
+            let score = this.proximityFunc(element, value);
+            return {score, elem: value};
+        }));
+        scores = scores.sort((a, b) => {
+            if (a.score > b.score) {
+                return -1;
+            } else if (a.score === b.score) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
+        return scores.slice(0, count).map((value => {
+            return value.elem;
         }));
     }
 
-    addElements(elements){
+
+    addElement(element) {
+        if (!element.key && element.key!==0){
+            // bad element -> no key
+            throw Error("Proximity List: element to be added should have a key");
+        }
+        element.proximityScore = this.proximityFunc(this.referenceElement.key, element.key).toFixed(3);
+        this._putElement(element);
+        this.list = this.list.slice(0, this.maximumListSize);
+    }
+
+    addElements(elements) {
         for (let elem of elements) {
             this.addElement(elem);
         }
     }
 
+    /**
+     *
+     * @return {null|*} most similar element object or null if list is empty
+     */
     getMostSimilarElement() {
-        if (this.list.length>0){
+        if (this.list.length > 0) {
             return this.list[0];
         }
-        return undefined;
+        return null;
     }
 
-    _putElement(element){
-        for (let i=0;i<this.list.length;i++){
-            if (this.list[i].proximityScore<element.proximityScore){
-                this.list.splice(i,0,element);
-                return;
+    /**
+     * Put the element in the list according to its score
+     * @param element
+     * @private
+     */
+    _putElement(element) {
+        let httpReq = new cyclonRtc.HttpRequestService();
+        for (let i = 0; i < this.list.length; i++) {
+            if (this.list[i].proximityScore < element.proximityScore) {
+                httpReq.get(`http://localhost:3500/stats/link_changed`);
+                this.list.splice(i, 0, element);
+                return true;
             }
         }
         this.list.push(element);
+        return false;
     }
 
-    getAllElements(){
+    getAllElements() {
         return this.list;
     }
 
-    getElementCount(){
+    getElementCount() {
         return this.list.length;
     }
 
 
-
 }
 
-
-// let prFunc = (a, b) => {
-//     return stringSimilarity.compareTwoStrings(a.index, b.index);
-// };
-
-
-// let pList = new ProximityList(10, {index: "Brendon"}, prFunc);
-// pList.addElement({index:"Jarrel"});
-// pList.addElement({index:"Ramon"});
-// pList.addElement({index:"Brendon"});
-// pList.addElement({index:"Khalil"});
-// pList.addElement({index:"Fae"});
-// pList.addElement({index:"Tom"});
-// //
-// //
-// console.log(pList.getMostSimilarElement());
-// console.log(pList.getAllElements());
-// console.log(pList.getElementCount());
+// let proxList = new ProximityList(4,{key: 8},(a,b)=>{return 1/Math.abs(a-b)})
+// for (let i=0;i<20;i++){
+//     proxList.addElement({key: i,value:i});
+// }
+// console.log(proxList);
 
 module.exports = ProximityList;
+

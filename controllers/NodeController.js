@@ -1,5 +1,8 @@
-class NodeController {
+var EventEmitter = require("events").EventEmitter;
+
+class NodeController extends EventEmitter{
     constructor(node) {
+        super();
         this.node = node;
     }
 
@@ -16,7 +19,7 @@ class NodeController {
     /**
      *
      * @param packet
-     * @return {Promise}
+     *
      */
     sendOutPacket(packet,targetNode){
         packet["date"] = new Date().getDate();

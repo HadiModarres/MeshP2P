@@ -74,6 +74,14 @@ describe("The peer connection", function () {
             expect(successCallback).not.toHaveBeenCalled();
         });
 
+        it("emits a channelCreated event", function(done) {
+            peerConnection.on("channelCreated", function(channel) {
+                expect(channel).toEqual(rtcDataChannel);
+                done();
+            });
+            peerConnection.createOffer().then(successCallback).catch(failureCallback);
+        });
+
         describe("and offer creation fails", function () {
 
             beforeEach(function () {
@@ -225,6 +233,19 @@ describe("The peer connection", function () {
         });
     });
 
+    describe("when a channel is created", function() {
+
+        it("emits a channel created event", function(done) {
+            peerConnection.on("channelCreated", function(channel) {
+                expect(channel).toBe(rtcDataChannel);
+                done();
+            });
+            rtcPeerConnection.ondatachannel({
+                channel: rtcDataChannel
+            });
+        });
+    });
+
     describe("when waiting for an open channel", function () {
 
         beforeEach(function (done) {
@@ -317,77 +338,6 @@ describe("The peer connection", function () {
                         self.fail(e);
                     })
                     .catch(done);
-            });
-        });
-    });
-
-    describe("when waiting for channel establishment", function () {
-
-        describe("and a channel has already been established", function () {
-
-            beforeEach(function () {
-                rtcPeerConnection.ondatachannel({
-                    channel: rtcDataChannel
-                });
-            });
-
-            it("will resolve with the already established channel", function (done) {
-                peerConnection.waitForChannelEstablishment()
-                    .then(function (result) {
-                        expect(result).toBe(rtcDataChannel);
-                        done();
-                    });
-            });
-        });
-
-        describe("and no channel is yet established", function () {
-
-            it("adds an ondatachannel listener", function () {
-                peerConnection.waitForChannelEstablishment().catch(Promise.TimeoutError, function() {
-                    // This will happen eventually
-                });
-                expect(rtcPeerConnection.ondatachannel).toEqual(jasmine.any(Function));
-            });
-
-            describe("and cancel is called before it is established", function () {
-
-                it("nullifies the ondatachannel listener", function (done) {
-                    peerConnection.waitForChannelEstablishment()
-                        .catch(Promise.CancellationError, function() {
-                            expect(rtcPeerConnection.ondatachannel).toBeNull();
-                            done();
-                        })
-                        .cancel();
-                });
-            });
-
-            describe("and a channel is established before the timeout", function () {
-
-                beforeEach(function (done) {
-                    peerConnection.waitForChannelEstablishment().then(function(result) {
-                        expect(result).toBe(rtcDataChannel);
-                        done();
-                    });
-                    rtcPeerConnection.ondatachannel({
-                        channel: rtcDataChannel
-                    });
-                });
-
-                it("nullifies the ondatachannel listener", function () {
-                    expect(rtcPeerConnection.ondatachannel).toBeNull();
-                });
-            });
-
-            describe("and a timeout occurs before the channel is established", function () {
-
-                beforeEach(function (done) {
-                    peerConnection.waitForChannelEstablishment()
-                        .catch(Promise.TimeoutError, done);
-                });
-
-                it("nullifies the ondatachannel listener", function () {
-                    expect(rtcPeerConnection.ondatachannel).toBeNull();
-                });
             });
         });
     });

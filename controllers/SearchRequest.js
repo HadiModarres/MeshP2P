@@ -5,11 +5,12 @@ var cyclonRtc = require('cyclon.p2p-rtc-client');
 
 
 class SearchRequest extends NodeController{
-   constructor(node,searchTerm){
+   constructor(node,searchTerm,list){
       super(node);
       this.searchTerm = searchTerm;
       this.id = uuid();
       this.responses = [];
+      this.list = list;
    }
 
    initiateSearch(){
@@ -20,10 +21,17 @@ class SearchRequest extends NodeController{
       packet[constants.PACKET_FIELD.PACKET_TYPE] = constants.PACKET_TYPE.SEARCH_REQ;
       packet[constants.PACKET_FIELD.HOPS] = 1;
       packet[constants.PACKET_FIELD.QUERY]= this.searchTerm;
+      packet[constants.PACKET_FIELD.LIST]= this.list;
+
+      let stats_obj = {event:constants.EVENTS.SEARCH_START,id:this.id,
+         source_name:this.node.name,query:this.searchTerm };
+      this.emit("stats", stats_obj);
+      // this.emit("stats", constants.EVENTS.SEARCH_START, this.id, this.node.name, this.searchTerm, neighborIds.length);
       for(let neighborId of neighborIds) {
          this.sendOutPacket(packet, neighborId);
-         let httpReq = new cyclonRtc.HttpRequestService();
-         httpReq.get(`http://localhost:3000/stats/search_started?id=${this.id}&source_id=${this.node.__cyclonNode.getId()}&query=${this.searchTerm}`);
+
+         // let httpReq = new cyclonRtc.HttpRequestService();
+         // httpReq.get(`http://localhost:3500/stats/search_started?id=${this.id}&source_name=${this.node.name}&query=${this.searchTerm}`);
       }
    }
 

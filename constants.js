@@ -10,5 +10,25 @@ module.exports.PACKET_FIELD = {
    PACKET_SOURCE: "packet_source",
    QUERY: "query",
    HOPS: "hops",
-   BODY:"body"
+   BODY:"body",
+   LIST: "list"
 };
+
+module.exports.EVENTS = {
+   SEARCH_START: 'start',
+   SEARCH_RELAY: 'relay',
+   SEARCH_DISCARDED: 'discard',
+   SEARCH_REVISITED: 'revisit',
+   SEARCH_RESPOND: 'respond',
+   PROX_LINK_CHANGED: 'prox_change',
+   NODE_STATS: 'node_stats',
+   ENC_INTERVAL: 'enc_interval'
+};
+
+module.exports.STATS_RECORDER = {
+   HTTP: "http",
+   FILE: "file",
+};
+
+module.exports.STATS_FILE_PATH = './stats.txt';
+module.exports.STATS_HTTP_URL = "http://localhost:3500/stats";

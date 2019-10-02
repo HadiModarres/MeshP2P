@@ -70,7 +70,7 @@ module.exports.buildAngularModule = function(angular) {
     var rtcModule = angular.module("cyclon-rtc", []);
 
     rtcModule.service("RTC", ["IceCandidateBatchingSignallingService", "ChannelFactory", RTC]);
-    rtcModule.service("ChannelFactory", ["PeerConnectionFactory", "IceCandidateBatchingSignallingService", "$log", ChannelFactory]);
+    rtcModule.service("ChannelFactory", ["PeerConnectionFactory", "IceCandidateBatchingSignallingService", "$log", "ChannelStateTimeout", ChannelFactory]);
     rtcModule.service("PeerConnectionFactory", ["RTCObjectFactory", "$log", "IceServers", "ChannelStateTimeout", PeerConnectionFactory]);
     rtcModule.service("RTCObjectFactory", ["$log", NativeRTCObjectFactory]);
     rtcModule.factory("AsyncExecService", Utils.asyncExecService);

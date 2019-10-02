@@ -1,26 +1,24 @@
 'use strict';
 
-var Promise = require("bluebird");
-var IncomingShuffleState = require("../lib/IncomingShuffleState.js");
-var ClientMocks = require("./ClientMocks");
+const Promise = require("bluebird");
+const IncomingShuffleState = require("../lib/IncomingShuffleState.js");
+const ClientMocks = require("./ClientMocks");
 
 describe("The Incoming ShuffleState", function () {
 
-    var SOURCE_POINTER = {id: "SOURCE_ID", age: 10};
+    const SOURCE_POINTER = {id: "SOURCE_ID", age: 10};
 
-    var LOCAL_SESSION_DESCRIPTION = "LOCAL_SESSION_DESCRIPTION";
-    var REQUEST_PAYLOAD = "REQUEST_PAYLOAD";
-    var RESPONSE_PAYLOAD = "RESPONSE_PAYLOAD";
-    var TIMEOUT_ID = "TIMEOUT_ID";
+    const REQUEST_PAYLOAD = "REQUEST_PAYLOAD";
+    const RESPONSE_PAYLOAD = "RESPONSE_PAYLOAD";
 
-    var localCyclonNode,
+    let localCyclonNode,
         asyncExecService,
         loggingService,
         successCallback,
         failureCallback,
         channel;
 
-    var incomingShuffleState;
+    let incomingShuffleState;
 
     beforeEach(function () {
         successCallback = ClientMocks.createSuccessCallback();
@@ -61,7 +59,7 @@ describe("The Incoming ShuffleState", function () {
         });
 
         describe("and a timeout occurs waiting for the request", function(){
-            var timeoutError;
+            let timeoutError;
 
             beforeEach(function(done) {
                 timeoutError = new Promise.TimeoutError();
@@ -75,23 +73,9 @@ describe("The Incoming ShuffleState", function () {
             });
         });
 
-        describe("and cancel is called before the response is sent", function() {
-
-            beforeEach(function(done) {
-                asyncExecService.setTimeout.and.returnValue(TIMEOUT_ID);
-                channel.receive.and.returnValue(Promise.resolve({payload: REQUEST_PAYLOAD}));
-                incomingShuffleState.processShuffleRequest(channel)
-                    .catch(Promise.CancellationError, done).cancel();
-            });
-
-            it("cancels the response sending", function() {
-                expect(asyncExecService.clearTimeout).toHaveBeenCalledWith(TIMEOUT_ID);
-            });
-        });
-
         describe("and cancel is called before the request arrives", function() {
 
-            var cancellationError;
+            let cancellationError;
 
             beforeEach(function(done) {
                 cancellationError = new Promise.CancellationError();
@@ -133,7 +117,7 @@ describe("The Incoming ShuffleState", function () {
         });
 
         describe("and cancel is called before the acknowledgement arrives", function() {
-            var cancellationError;
+            let cancellationError;
 
             it("rejects with the cancellation error", function(done) {
                 cancellationError = new Promise.CancellationError();
@@ -144,28 +128,9 @@ describe("The Incoming ShuffleState", function () {
         });
     });
 
-    describe("when closing", function() {
-
-        beforeEach(function(done) {
-            asyncExecService.setTimeout.and.returnValue(TIMEOUT_ID);
-            channel.receive.and.returnValue(Promise.resolve({payload: REQUEST_PAYLOAD}));
-            incomingShuffleState.processShuffleRequest(channel)
-                .then(successCallback).catch(failureCallback);
-
-            setTimeout(function() {
-                incomingShuffleState.close();
-                done();
-            }, 10);
-        });
-
-        it("clears the response sending timeout", function() {
-            expect(asyncExecService.clearTimeout).toHaveBeenCalledWith(TIMEOUT_ID);
-        });
-    });
-
     describe("when cancelling", function() {
 
-        var lastOutstandingPromise;
+        let lastOutstandingPromise;
 
         beforeEach(function() {
             lastOutstandingPromise = ClientMocks.mockPromise();

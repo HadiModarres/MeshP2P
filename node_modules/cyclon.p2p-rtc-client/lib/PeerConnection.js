@@ -29,7 +29,7 @@ function PeerConnection(rtcPeerConnection, rtcObjectFactory, logger, channelStat
     //
     rtcPeerConnection.ondatachannel = function (event) {
         rtcDataChannel = event.channel;
-        logger.warn("Data channel creation was early!");
+        self.emit("channelCreated", event.channel);
     };
 
     /**
@@ -45,6 +45,7 @@ function PeerConnection(rtcPeerConnection, rtcObjectFactory, logger, channelStat
             // Create the data channel
             //
             rtcDataChannel = rtcPeerConnection.createDataChannel("cyclonShuffleChannel");
+            self.emit("channelCreated", rtcDataChannel);
 
             //
             // Create an offer, wait for ICE candidates
@@ -113,34 +114,6 @@ function PeerConnection(rtcPeerConnection, rtcObjectFactory, logger, channelStat
     this.startEmittingIceCandidates = function () {
         emittingIceCandidates = true;
         addLocalIceCandidate(null);
-    };
-
-    /**
-     * Wait for the data channel to appear on the peerConnection then resolve with it
-     *
-     * @returns {Promise}
-     */
-    this.waitForChannelEstablishment = function () {
-
-        lastOutstandingPromise = new Promise(function (resolve) {
-            if (rtcDataChannel !== null) {
-                resolve(rtcDataChannel);
-            }
-            else {
-                rtcPeerConnection.ondatachannel = function (event) {
-                    rtcPeerConnection.ondatachannel = null;
-                    rtcDataChannel = event.channel;
-                    resolve(rtcDataChannel);
-                };
-            }
-        })
-        .timeout(channelStateTimeoutMs, "Data channel establishment timeout exceeded")
-        .catch(Promise.TimeoutError, Promise.CancellationError, function (e) {
-            rtcPeerConnection.ondatachannel = null;
-            throw e;
-        });
-
-        return lastOutstandingPromise;
     };
 
     /**

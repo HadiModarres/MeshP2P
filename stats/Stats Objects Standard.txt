@@ -1,0 +1,68 @@
+Standard for emitted stats objects:
+
+event: constants -> EVENTS enum
+
+Search Request:
+{
+    event
+    id: search request id
+    source_name: requesting node name
+    query: search query
+}
+
+
+Search Relay:
+{
+    event
+    id: search request id
+    source_name: requesting node name
+    target_name: target node name
+}
+
+
+Search Response:
+{
+    event
+    id: search request id
+    source_name: requesting node name
+}
+
+Search Discard:
+{
+    event
+    id: search request id
+    source_name: requesting node name
+}
+
+Search Revisit:
+{
+    event
+    id: search request id
+    source_name: requesting node name
+}
+
+Encounter Interval:
+{
+    event
+    sample_size
+    interval_count
+    total_avg
+    source_name: requesting node name
+}
+
+Node Stats:
+{
+    id: node name,
+    neighbors: [node_name] : array of other neighbor names,
+    shuffles: shuffle count
+    timeouts: timeout count
+    errors: error count
+    enc_interval: encounter interval total average
+}
+
+
+Proximity List Changed:
+{
+    event
+    source_name
+}
