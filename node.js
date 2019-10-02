@@ -13,7 +13,7 @@ const ListManager = require("./proximity/ListManager");
 let StatsRecorder = require("./stats/HTTPStatsRecorder");
 var EventEmitter = require("events").EventEmitter;
 let NodeStatsProbe = require("./stats/NodeStatsProbe");
-let config = require("./config");
+let NodeConfig = require("./config");
 const constants = require("./constants");
 
 let logger = console;
@@ -94,9 +94,9 @@ class Node extends EventEmitter{
         let timingService = new cyclonRtc.TimingService();
 
 //level 5
-        let signallingServerService = new cyclonRtc.StaticSignallingServerService(config.DEFAULT_SIGNALLING_SERVERS);
+        let signallingServerService = new cyclonRtc.StaticSignallingServerService(NodeConfig.DEFAULT_SIGNALLING_SERVERS);
         let socketFactory = new cyclonRtc.SocketFactory();
-        let signallingServerSelector = new cyclonRtc.SignallingServerSelector(signallingServerService, persistentStorage, timingService, config.DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS);
+        let signallingServerSelector = new cyclonRtc.SignallingServerSelector(signallingServerService, persistentStorage, timingService, NodeConfig.DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS);
 
 
 //level4
@@ -108,13 +108,13 @@ class Node extends EventEmitter{
 
 //level3
         let signallingService = new cyclonRtc.SocketIOSignallingService(signallingSocket, logger, httpRequestService, persistentStorage);
-        let peerConnectionFactory = new cyclonRtc.PeerConnectionFactory(rtcObjectFactory, logger, config.DEFAULT_ICE_SERVERS, config.DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
+        let peerConnectionFactory = new cyclonRtc.PeerConnectionFactory(rtcObjectFactory, logger, NodeConfig.DEFAULT_ICE_SERVERS, NodeConfig.DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
 
 
 //level 2
         let iceCandidateBatchingSignalling = new cyclonRtc.IceCandidateBatchingSignallingService(Utils.asyncExecService(),
-            signallingService, config.DEFAULT_BATCHING_DELAY_MS);
-        let channelFactory = new cyclonRtc.ChannelFactory(peerConnectionFactory, iceCandidateBatchingSignalling, logger,config.DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
+            signallingService, NodeConfig.DEFAULT_BATCHING_DELAY_MS);
+        let channelFactory = new cyclonRtc.ChannelFactory(peerConnectionFactory, iceCandidateBatchingSignalling, logger,NodeConfig.DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
         let shuffleStateFactory = new cyclonRtcComms.ShuffleStateFactory(logger, Utils.asyncExecService());
 
 
@@ -127,24 +127,24 @@ class Node extends EventEmitter{
 // level 0
 
         this.__cyclonNode = cyclon.builder(this.comms, this.bootStrap)
-            .withNumNeighbours(config.NEIGHBOR_SIZE)
+            .withNumNeighbours(NodeConfig.NEIGHBOR_SIZE)
             .withMetadataProviders({
                     "clientInfo": () => {
                         return this.listManager.getAllLocalEntries();
                     },
                 }
             )
-            .withShuffleSize(config.SHUFFLE_SIZE)
-            .withTickIntervalMs(config.TICK_INTERVAL)
+            .withShuffleSize(NodeConfig.SHUFFLE_SIZE)
+            .withTickIntervalMs(NodeConfig.TICK_INTERVAL)
             .build();
 
 
     }
 
     startNode(){
-        this.__cyclonNode.on("shuffleCompleted",(direction)=>{
-            console.info("shuffle completed");
-        });
+        // this.__cyclonNode.on("shuffleCompleted",(direction)=>{
+        //     console.info("shuffle completed");
+        // });
 
         this.__cyclonNode.on("shuffleError", (direction) => {
             console.error("shuffle error");
@@ -191,9 +191,13 @@ class Node extends EventEmitter{
 
     __setupHandlerForNewNeighborSet(){
         this.__cyclonNode.on("shuffleCompleted", (direction,pointer)=> {
+            console.info("handling shuffle complete: ");
+            console.info(direction);
+            console.info(NodeConfig.NEIGHBOR_SIZE);
             let pointerSet = this.getRandomSamplePointers();
             let entries = this.__extractListEntriesFromPointers(pointerSet);
             this.__incorporateNeighbourList(entries);
+            console.log(JSON.stringify(entries));
             this.__sendNeighborsToStatsServer();
         });
     }

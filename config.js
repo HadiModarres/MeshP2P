@@ -1,7 +1,7 @@
 let CONFIG = {
     NEIGHBOR_SIZE: 20,
-    SHUFFLE_SIZE: 5,
-    TICK_INTERVAL: 20000,
+    SHUFFLE_SIZE: 10,
+    TICK_INTERVAL: 8000,
     DEFAULT_SIGNALLING_SERVERS: [
         {
             "socket": {
