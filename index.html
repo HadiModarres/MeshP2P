@@ -23,20 +23,11 @@
     </style>
 </head>
 <body>
-<div class="grid-container">
-<div class="grid-item">name: </div>
-<div class="grid-item" id="name"></div>
-<div class="grid-item">id: </div>
-<div class="grid-item" id="id"></div>
-<div class="grid-item">Previous</div>
-<div class="grid-item">Current</div>
-<div  class="grid-item" id="neighbors_previous" >prev</div>
-<div  class="grid-item" id="neighbors_current" >curr</div>
-<div  class="grid-item" >name</div>
-<div  class="grid-item" id="names" ></div>
+<div>name:<span id="name"></span> </div>
+
 <input type="text" class="grid-item" id="new_name">
-<div class="grid-item"></div>
-<button class="grid-item" onclick="runTest()">Run</button>
+<button class="grid-item" onclick="runTest()">Search</button>
+<div id="results"></div>
 
 </div>
 </body>

@@ -42,6 +42,7 @@ class SearchRequest extends NodeController{
          return false;
       console.info("received response for request: " + this.id +" response from: "+packet[constants.PACKET_FIELD.PACKET_SOURCE]);
       this.responses.push(packet);
+      this.emit("search_result",packet);
       return true;
    }
 }
