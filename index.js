@@ -11,13 +11,13 @@ let node = new Node();
 // while (name.charAt(0) !== 'K') {
 //     name = faker.name.firstName();
 // }
-let name = `${Math.floor(Math.random()*100)},${Math.floor(Math.random()*100)}`;
+let name = `${Math.floor(Math.random()*200)},${Math.floor(Math.random()*200)}`;
 node.registerList("list#name", (a, b) =>{
     let x1 = a.split(",")[0];
     let y1 = a.split(",")[1];
     let x2 = b.split(",")[0];
     let y2 = b.split(",")[1];
-    return 200-Math.sqrt(Math.pow((x1-x2),2)+Math.pow((y1-y2),2));
+    return 2000-Math.sqrt(Math.pow(Math.abs(x1-x2),2)+Math.pow(Math.abs(y1-y2),2));
 });
 node.setEntries("list#name", [name]);
 node.name= name;

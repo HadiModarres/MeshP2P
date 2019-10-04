@@ -32,7 +32,7 @@ class EncounterIntervalProbe extends EventEmitter{
    }
 
    _gatherData(){
-      this._node.__cyclonNode.on("neighbours_updated", ()=> {
+      this._node.__cyclonNode.on("shuffleCompleted", (direction,pointer)=> {
          this.currentIndex++;
           if (this.currentIndex===1){
              this._initializeSamples();

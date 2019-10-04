@@ -114,16 +114,21 @@ class ProximityList extends EventEmitter{
      * @private
      */
     _putElement(element) {
-        let httpReq = new cyclonRtc.HttpRequestService();
+        console.info(`putting element: ${element.key}`);
         for (let i = 0; i < this.list.length; i++) {
             if (this.list[i].proximityScore < element.proximityScore) {
-                httpReq.get(`http://localhost:3500/stats/link_changed`);
                 this.list.splice(i, 0, element);
                 return true;
             }
         }
         this.list.push(element);
         return false;
+    }
+
+    getKeys(){
+        return this.list.map((value => {
+            return value.key;
+        }));
     }
 
     getAllElements() {

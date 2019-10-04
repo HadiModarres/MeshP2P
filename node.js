@@ -13,6 +13,7 @@ const ListManager = require("./proximity/ListManager");
 let StatsRecorder = require("./stats/HTTPStatsRecorder");
 var EventEmitter = require("events").EventEmitter;
 let NodeStatsProbe = require("./stats/NodeStatsProbe");
+let ProximityLinkChangePrope = require("./stats/ProximityLinkChangeProbe");
 let NodeConfig = require("./config");
 const constants = require("./constants");
 
@@ -27,6 +28,7 @@ class Node extends EventEmitter{
         this.statsRecorder = new StatsRecorder();
         this.__initCyclonNode();
         this.statsProbe= new NodeStatsProbe(this,4000);
+        this.linkChangeProbe = new ProximityLinkChangePrope(this);
         this.__initSearchControllers();
         this.__addEventListeners();
     }
@@ -177,6 +179,16 @@ class Node extends EventEmitter{
         return listEntries;
     }
 
+    __extractNodeIdsFromPointers(nodePointers){
+        let nodeIds = [];
+        for (let pointer of nodePointers){
+            if (!nodeIds.includes(pointer.id)){
+                nodeIds.push(pointer.id);
+            }
+        }
+        return nodeIds;
+    }
+
     __getRandomEntriesForList(list){
         let randomPointers = this.getRandomSamplePointers();
         let randomEntries = this.__extractListEntriesFromPointers(randomPointers);
@@ -194,19 +206,32 @@ class Node extends EventEmitter{
             console.info("handling shuffle complete: ");
             console.info(direction);
             console.info(NodeConfig.NEIGHBOR_SIZE);
+            let namesProxList = this.listManager.getAllProximityLists("list#name")[0];
+            let beforeKeys = namesProxList.getAllElements().map((value) => {
+                return value.key;
+            });
             let pointerSet = this.getRandomSamplePointers();
             let entries = this.__extractListEntriesFromPointers(pointerSet);
+            let nodeIds = this.__extractNodeIdsFromPointers(pointerSet);
+            for (let nodeId of nodeIds){
+                this.__removeNeighbour({pointer: {id: nodeId}});
+            }
             this.__incorporateNeighbourList(entries);
             console.log(JSON.stringify(entries));
             this.__sendNeighborsToStatsServer();
+            let afterKeys = namesProxList.getAllElements().map((value) => {
+                return value.key;
+            });
+            this.emit("neighbors_updated",beforeKeys,afterKeys);
         });
     }
 
+
+
     __incorporateNeighbourList(neighbourList) {
         for (let neighbor of neighbourList){
-            this.__removeNeighbour(neighbor);
-            this.listManager.addElementToAllProximityLists(neighbor.list,
-                {key:neighbor.key,value:neighbor.pointer})
+            let changed = this.listManager.addElementToAllProximityLists(neighbor.list,
+                {key:neighbor.key,value:neighbor.pointer});
         }
     }
 

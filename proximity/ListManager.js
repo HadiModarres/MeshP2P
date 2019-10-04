@@ -5,7 +5,7 @@ let ProximityList = require("./ProximityList");
  */
 class ListManager {
     constructor() {
-        this.proximityListSize = 4;
+        this.proximityListSize = 6;
         this.lists = [];
 
     }
@@ -90,6 +90,7 @@ class ListManager {
                 l.addElement(element);
             }
     }
+
 
     getAllProximityLists(globalList) {
         let list = this.getGlobalList(globalList);
