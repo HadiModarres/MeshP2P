@@ -114,7 +114,6 @@ class ProximityList extends EventEmitter{
      * @private
      */
     _putElement(element) {
-        console.info(`putting element: ${element.key}`);
         for (let i = 0; i < this.list.length; i++) {
             if (this.list[i].proximityScore < element.proximityScore) {
                 this.list.splice(i, 0, element);

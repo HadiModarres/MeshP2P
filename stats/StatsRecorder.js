@@ -7,8 +7,6 @@ class StatsRecorder{
     addEventEmitter(ee){
        this.eventEmitters.push(ee) ;
        ee.on("stats",(statsObj)=>{
-           console.info("args:");
-           console.info(statsObj);
            this.__handleStats(statsObj);
        });
     }

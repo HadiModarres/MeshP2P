@@ -203,9 +203,6 @@ class Node extends EventEmitter{
 
     __setupHandlerForNewNeighborSet(){
         this.__cyclonNode.on("shuffleCompleted", (direction,pointer)=> {
-            console.info("handling shuffle complete: ");
-            console.info(direction);
-            console.info(NodeConfig.NEIGHBOR_SIZE);
             let namesProxList = this.listManager.getAllProximityLists("list#name")[0];
             let beforeKeys = namesProxList.getAllElements().map((value) => {
                 return value.key;
@@ -217,7 +214,6 @@ class Node extends EventEmitter{
                 this.__removeNeighbour({pointer: {id: nodeId}});
             }
             this.__incorporateNeighbourList(entries);
-            console.log(JSON.stringify(entries));
             this.__sendNeighborsToStatsServer();
             let afterKeys = namesProxList.getAllElements().map((value) => {
                 return value.key;
