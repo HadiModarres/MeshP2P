@@ -1,4 +1,5 @@
-# MeshP2P
-Create P2P apps between browsers
 
-![MeshP2P Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Fully-connected_mesh_network.svg/534px-Fully-connected_mesh_network.svg.png)
+
+
+<a href="https://meshp2p.org"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/NetworkTopology-FullyConnected.png" height="150" align="right"></a>
+# Mesh P2P
