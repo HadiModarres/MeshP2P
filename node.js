@@ -16,6 +16,7 @@ let NodeStatsProbe = require("./stats/NodeStatsProbe");
 let ProximityLinkChangePrope = require("./stats/ProximityLinkChangeProbe");
 let NodeConfig = require("./config");
 const constants = require("./constants");
+let ProximityLinkBooster = require("./controllers/ProximityLinkBooster");
 
 let logger = console;
 
@@ -31,6 +32,8 @@ class Node extends EventEmitter{
         this.linkChangeProbe = new ProximityLinkChangePrope(this);
         this.__initSearchControllers();
         this.__addEventListeners();
+        this.proximityLinkBooster = new ProximityLinkBooster(this,"list#name");
+        this.__controllers.push(this.proximityLinkBooster);
     }
 
     __addEventListeners(){

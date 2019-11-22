@@ -1,6 +1,7 @@
 module.exports.PACKET_TYPE = {
    SEARCH_REQ:"search_req",
    SEARCH_RES:"search_res",
+   PROXIMITY_LINKS: "proximity_links"
 };
 
 module.exports.PACKET_FIELD = {
@@ -11,7 +12,8 @@ module.exports.PACKET_FIELD = {
    QUERY: "query",
    HOPS: "hops",
    BODY:"body",
-   LIST: "list"
+   LIST: "list",
+   POINTERS: "pointers"
 };
 
 module.exports.EVENTS = {
