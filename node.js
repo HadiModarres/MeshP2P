@@ -162,7 +162,7 @@ class Node extends EventEmitter{
         console.info("starting node");
         this.__cyclonNode.start();
         console.info(this.__cyclonNode.createNewPointer());
-        this.__setupHandlerForNewNeighborSet();
+        this.__setupHandlerForNewRandomNeighborSet();
         this.__listenForPackets();
     }
 
@@ -204,19 +204,14 @@ class Node extends EventEmitter{
         }));
     }
 
-    __setupHandlerForNewNeighborSet(){
+    __setupHandlerForNewRandomNeighborSet(){
         this.__cyclonNode.on("shuffleCompleted", (direction,pointer)=> {
             let namesProxList = this.listManager.getAllProximityLists("list#name")[0];
             let beforeKeys = namesProxList.getAllElements().map((value) => {
                 return value.key;
             });
             let pointerSet = this.getRandomSamplePointers();
-            let entries = this.__extractListEntriesFromPointers(pointerSet);
-            let nodeIds = this.__extractNodeIdsFromPointers(pointerSet);
-            for (let nodeId of nodeIds){
-                this.__removeNeighbour({pointer: {id: nodeId}});
-            }
-            this.__incorporateNeighbourList(entries);
+            this._handlePointerSet(pointerSet);
             this.__sendNeighborsToStatsServer();
             let afterKeys = namesProxList.getAllElements().map((value) => {
                 return value.key;
@@ -225,6 +220,14 @@ class Node extends EventEmitter{
         });
     }
 
+    _handlePointerSet(pointerSet){
+        let entries = this.__extractListEntriesFromPointers(pointerSet);
+        let nodeIds = this.__extractNodeIdsFromPointers(pointerSet);
+        for (let nodeId of nodeIds){
+            this.__removeNeighbour({pointer: {id: nodeId}});
+        }
+        this.__incorporateNeighbourList(entries);
+    }
 
 
     __incorporateNeighbourList(neighbourList) {
@@ -274,6 +277,7 @@ class Node extends EventEmitter{
             if (controller.handlePacket(packet))
                 return;
         }
+        console.error(packet[constants.PACKET_FIELD.PACKET_TYPE]);
         let stats_obj = {event:constants.EVENTS.SEARCH_DISCARDED,id:packet[constants.PACKET_FIELD.PACKET_ID],source_name:this.name};
         this.emit("stats", stats_obj);
         // let httpReq = new cyclonRtc.HttpRequestService();
