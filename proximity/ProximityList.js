@@ -18,6 +18,8 @@ class ProximityList extends EventEmitter{
         this.maximumListSize = maximumListSize;
         this.proximityFunc = proximityFunc;
         this.referenceElement = referenceElement;
+        this.inboundListSize = 10;
+        // this.inboundList = [];
     }
 
     /**
@@ -96,6 +98,13 @@ class ProximityList extends EventEmitter{
             this.addElement(elem);
         }
     }
+
+    // addInboundElement(element){
+    //     this.inboundList.unshift(element);
+    //     if (this.inboundList.length >= this.inboundListSize) {
+    //        this.inboundList.pop();
+    //     }
+    // }
 
     /**
      *

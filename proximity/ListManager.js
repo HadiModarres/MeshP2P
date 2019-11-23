@@ -7,7 +7,7 @@ class ListManager {
     constructor() {
         this.proximityListSize = 6;
         this.lists = [];
-
+        this.inboundListSize = 5;
     }
 
     addGlobalList(globalList, proximityFunction) {
@@ -16,8 +16,25 @@ class ListManager {
                 throw new Error(`global list "${globalList}" exists already`);
             }
         }
-        let newGlobalList = {listName: globalList, lists: [], proximityFunction: proximityFunction};
+        let newGlobalList = {listName: globalList, lists: [], proximityFunction: proximityFunction, inboundList: []};
         this.lists.push(newGlobalList);
+
+    }
+
+    addInboundElementToList(globalList,entry){
+        if (!entry.key && entry.key!==0){
+            // bad element -> no key
+            throw Error("List Manager: entry to be added should have a key");
+        }
+        let list = this.getGlobalList(globalList);
+        if (!list) {
+            console.warn(entry);
+        } else {
+                list.inboundList.unshift(entry);
+                if (list.inboundList.length >= this.inboundListSize) {
+                   list.inboundList.pop();
+                }
+        }
 
     }
 
