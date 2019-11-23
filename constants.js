@@ -13,7 +13,8 @@ module.exports.PACKET_FIELD = {
    HOPS: "hops",
    BODY:"body",
    LIST: "list",
-   POINTERS: "pointers"
+   POINTERS: "pointers",
+   ENTRY: ""
 };
 
 module.exports.EVENTS = {

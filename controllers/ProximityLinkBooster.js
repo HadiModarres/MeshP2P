@@ -14,11 +14,14 @@ class ProximityLinkBooster extends NodeController{
      * @return {Boolean} true if packet could be handled, false if this controller can't handle the given packet
      */
     handlePacket(packet){
-        if (packet[constants.PACKET_FIELD.PACKET_TYPE] !== constants.PACKET_TYPE.PROXIMITY_LINKS) {
+        if (packet[constants.PACKET_FIELD.PACKET_TYPE] !== constants.PACKET_TYPE.PROXIMITY_LINKS ||
+            packet[constants.PACKET_FIELD.LIST !== this._globalList]) {
             console.error("cant handle: "+ packet[constants.PACKET_FIELD.PACKET_TYPE]);
             return false;
         }
         this.node._handlePointerSet(packet[constants.PACKET_FIELD.POINTERS]);
+        let entry = {key: packet[constants.PACKET_FIELD.ENTRY], value: packet[constants.PACKET_FIELD.PACKET_SOURCE]};
+        this.node.listManager.addInboundElementToList(packet[constants.PACKET_FIELD.LIST], entry);
         return true;
     }
 
@@ -51,6 +54,9 @@ class ProximityLinkBooster extends NodeController{
         let packet = {};
         packet[constants.PACKET_FIELD.PACKET_TYPE] = constants.PACKET_TYPE.PROXIMITY_LINKS;
         packet[constants.PACKET_FIELD.POINTERS] = pointers;
+        packet[constants.PACKET_FIELD.LIST] = this._globalList;
+        packet[constants.PACKET_FIELD.ENTRY] = proxList.referenceElement.key;
+        packet[constants.PACKET_FIELD.PACKET_SOURCE] = this.node.__cyclonNode.createNewPointer();
         return packet;
     }
 

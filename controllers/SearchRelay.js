@@ -33,6 +33,7 @@ class SearchRelay extends NodeController{
                 return {key:value.key,value:value.pointer};
             }));
             let allEntries = bestProxList.getAllElements().concat(randomEntries);
+            allEntries = allEntries.concat(this.node.listManager.getInboundListForGlobalList(packet[constants.PACKET_FIELD.LIST]));
             let sortedList = bestProxList.sortListOnProximityToElement(allEntries, {key: packet[constants.PACKET_FIELD.QUERY]});
 
             // let nearNodes = bestProxList.nearestNodesTo({key:packet[constants.PACKET_FIELD.QUERY]}, n);

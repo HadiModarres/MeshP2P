@@ -20,6 +20,7 @@ class NodeStatsProbe extends EventEmitter{
 
       let proxList = this.node.listManager.getAllProximityLists("list#name")[0];
       let neighbors = proxList.getAllElements();
+      neighbors = neighbors.concat(this.node.listManager.getInboundListForGlobalList("list#name"));
       neighbors = neighbors.map((value) => {
          return value.key;
       });

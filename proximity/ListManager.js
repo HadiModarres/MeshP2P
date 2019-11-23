@@ -35,7 +35,14 @@ class ListManager {
                    list.inboundList.pop();
                 }
         }
-
+    }
+    getInboundListForGlobalList(globalList){
+        let list = this.getGlobalList(globalList);
+        if (!list) {
+            console.warn(entry);
+        } else {
+           return list.inboundList;
+        }
     }
 
     /**
