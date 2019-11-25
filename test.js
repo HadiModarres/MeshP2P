@@ -38,3 +38,6 @@ setTimeout(()=>{
 // a.splice(1, 0, 80);
 // console.log(a);
 // console.log(a.slice(0, a.length));
+
+let {x,y=10} = {x:3}
+console.log(y);

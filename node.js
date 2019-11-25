@@ -14,15 +14,53 @@ let StatsRecorder = require("./stats/HTTPStatsRecorder");
 var EventEmitter = require("events").EventEmitter;
 let NodeStatsProbe = require("./stats/NodeStatsProbe");
 let ProximityLinkChangePrope = require("./stats/ProximityLinkChangeProbe");
-let NodeConfig = require("./config");
 const constants = require("./constants");
 let ProximityLinkBooster = require("./controllers/ProximityLinkBooster");
 
 let logger = console;
 
 class Node extends EventEmitter{
-    constructor() {
+    constructor(
+        {
+            NEIGHBOR_SIZE= 7,
+            SHUFFLE_SIZE= 3,
+            TICK_INTERVAL= 20000,
+            DEFAULT_SIGNALLING_SERVERS= [
+                {
+                    "socket": {
+                        "server": "http://localhost:12345"
+                    },
+                    "signallingApiBase": "http://localhost:12345"
+                },
+                {
+                    "socket": {
+                        "server": "http://localhost:12346"
+                    },
+                    "signallingApiBase": "http://localhost:12346"
+                }
+            ],
+            DEFAULT_BATCHING_DELAY_MS= 300,
+            DEFAULT_ICE_SERVERS= [
+                // The public Google STUN server
+                {urls: ['stun:stun.l.google.com:19302']},
+            ],
+            DEFAULT_CHANNEL_STATE_TIMEOUT_MS= 30000,
+            DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS= 5000
+        }
+    ) {
         super();
+
+        this._config = {};
+        //how to do following assignments in one statement?
+        this._config.NEIGHBOR_SIZE= NEIGHBOR_SIZE;
+        this._config.SHUFFLE_SIZE= SHUFFLE_SIZE;
+        this._config.TICK_INTERVAL= TICK_INTERVAL;
+        this._config.DEFAULT_SIGNALLING_SERVERS= DEFAULT_SIGNALLING_SERVERS;
+        this._config.DEFAULT_BATCHING_DELAY_MS= DEFAULT_BATCHING_DELAY_MS;
+        this._config.DEFAULT_ICE_SERVERS= DEFAULT_ICE_SERVERS;
+        this._config.DEFAULT_CHANNEL_STATE_TIMEOUT_MS= DEFAULT_CHANNEL_STATE_TIMEOUT_MS;
+        this._config.DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS= DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS;
+
         this.__controllers = [];
         this.listManager = new ListManager();
         this.name = '';
@@ -40,6 +78,7 @@ class Node extends EventEmitter{
         for (let c of this.__controllers) {
             this.statsRecorder.addEventEmitter(c);
         }
+
         this.statsRecorder.addEventEmitter(this);
         this.statsRecorder.addEventEmitter(this.statsProbe);
     }
@@ -62,6 +101,7 @@ class Node extends EventEmitter{
         for (let entry of entries) {
             this.listManager.addEntry(list,{key:entry});
         }
+
     }
 
     /**
@@ -99,9 +139,9 @@ class Node extends EventEmitter{
         let timingService = new cyclonRtc.TimingService();
 
 //level 5
-        let signallingServerService = new cyclonRtc.StaticSignallingServerService(NodeConfig.DEFAULT_SIGNALLING_SERVERS);
+        let signallingServerService = new cyclonRtc.StaticSignallingServerService(this._config.DEFAULT_SIGNALLING_SERVERS);
         let socketFactory = new cyclonRtc.SocketFactory();
-        let signallingServerSelector = new cyclonRtc.SignallingServerSelector(signallingServerService, persistentStorage, timingService, NodeConfig.DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS);
+        let signallingServerSelector = new cyclonRtc.SignallingServerSelector(signallingServerService, persistentStorage, timingService, this._config.DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS);
 
 
 //level4
@@ -113,13 +153,13 @@ class Node extends EventEmitter{
 
 //level3
         let signallingService = new cyclonRtc.SocketIOSignallingService(signallingSocket, logger, httpRequestService, persistentStorage);
-        let peerConnectionFactory = new cyclonRtc.PeerConnectionFactory(rtcObjectFactory, logger, NodeConfig.DEFAULT_ICE_SERVERS, NodeConfig.DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
+        let peerConnectionFactory = new cyclonRtc.PeerConnectionFactory(rtcObjectFactory, logger, this._config.DEFAULT_ICE_SERVERS, this._config.DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
 
 
 //level 2
         let iceCandidateBatchingSignalling = new cyclonRtc.IceCandidateBatchingSignallingService(Utils.asyncExecService(),
-            signallingService, NodeConfig.DEFAULT_BATCHING_DELAY_MS);
-        let channelFactory = new cyclonRtc.ChannelFactory(peerConnectionFactory, iceCandidateBatchingSignalling, logger,NodeConfig.DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
+            signallingService, this._config.DEFAULT_BATCHING_DELAY_MS);
+        let channelFactory = new cyclonRtc.ChannelFactory(peerConnectionFactory, iceCandidateBatchingSignalling, logger,this._config.DEFAULT_CHANNEL_STATE_TIMEOUT_MS);
         let shuffleStateFactory = new cyclonRtcComms.ShuffleStateFactory(logger, Utils.asyncExecService());
 
 
@@ -132,24 +172,24 @@ class Node extends EventEmitter{
 // level 0
 
         this.__cyclonNode = cyclon.builder(this.comms, this.bootStrap)
-            .withNumNeighbours(NodeConfig.NEIGHBOR_SIZE)
+            .withNumNeighbours(this._config.NEIGHBOR_SIZE)
             .withMetadataProviders({
                     "clientInfo": () => {
                         return this.listManager.getAllLocalEntries();
                     },
                 }
             )
-            .withShuffleSize(NodeConfig.SHUFFLE_SIZE)
-            .withTickIntervalMs(NodeConfig.TICK_INTERVAL)
+            .withShuffleSize(this._config.SHUFFLE_SIZE)
+            .withTickIntervalMs(this._config.TICK_INTERVAL)
             .build();
 
 
     }
 
     startNode(){
-        // this.__cyclonNode.on("shuffleCompleted",(direction)=>{
-        //     console.info("shuffle completed");
-        // });
+        this.__cyclonNode.on("shuffleCompleted",(direction)=>{
+            console.info("shuffle completed");
+        });
 
         this.__cyclonNode.on("shuffleError", (direction) => {
             console.error("shuffle error");

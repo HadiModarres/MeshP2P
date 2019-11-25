@@ -1,23 +1,33 @@
 {
-  "name": "cyclon_node_test",
+  "name": "meshp2p",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "mocha 'test/*' || true",
-    "build": "browserify index.js -o bundle.js"
+    "build": "browserify index.js -o bundle.js",
+    "server": "node signalling_server.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "browser",
+    "p2p",
+    "webrtc",
+    "cyclon",
+    "browser p2p",
+    "gossip",
+    "rtc"
+  ],
+  "author": "Hadi Modarres <modarres.zadeh@gmail.com> (github.com/HadiModarres)",
   "license": "ISC",
-  "description": "",
+  "description": "https://github.com/HadiModarres/MeshP2P",
   "dependencies": {
-    "angular": "^1.7.8",
+    "angular": "^1.7.9",
     "browserify": "^16.5.0",
     "chai": "^4.2.0",
     "cyclon.p2p": "0.1.12",
     "cyclon.p2p-common": "^0.1.7",
     "cyclon.p2p-rtc-client": "^0.1.31",
     "cyclon.p2p-rtc-comms": "^0.1.30",
+    "cyclon.p2p-rtc-server": "^0.1.11",
     "faker": "^4.1.0",
     "mocha": "^6.2.1",
     "string-similarity": "^3.0.0",
