@@ -2,13 +2,9 @@ var cyclon = require('cyclon.p2p');
 var cyclonRtc = require('cyclon.p2p-rtc-client');
 var cyclonRtcComms = require('cyclon.p2p-rtc-comms');
 var Utils = require("cyclon.p2p-common");
-var ClientInfoService = require("./services/ClientInfoService");
-let ProximityList = require("./proximity/ProximityList");
-let stringSimilarity = require("string-similarity");
-var Promise = require("bluebird");
-let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
 let SearchRelay = require("./controllers/SearchRelay");
+let SearchRequest = require("./controllers/SearchRequest");
 const ListManager = require("./proximity/ListManager");
 let StatsRecorder = require("./stats/HTTPStatsRecorder");
 var EventEmitter = require("events").EventEmitter;
@@ -45,7 +41,8 @@ class Node extends EventEmitter{
                 {urls: ['stun:stun.l.google.com:19302']},
             ],
             DEFAULT_CHANNEL_STATE_TIMEOUT_MS= 30000,
-            DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS= 5000
+            DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS= 5000,
+            ANALYTICS= false
         }
     ) {
         super();
@@ -60,28 +57,23 @@ class Node extends EventEmitter{
         this._config.DEFAULT_ICE_SERVERS= DEFAULT_ICE_SERVERS;
         this._config.DEFAULT_CHANNEL_STATE_TIMEOUT_MS= DEFAULT_CHANNEL_STATE_TIMEOUT_MS;
         this._config.DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS= DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS;
+        this._config.ANALYTICS = ANALYTICS;
 
         this.__controllers = [];
         this.listManager = new ListManager();
         this.name = '';
-        this.statsRecorder = new StatsRecorder();
         this.__initCyclonNode();
-        this.statsProbe= new NodeStatsProbe(this,4000);
-        this.linkChangeProbe = new ProximityLinkChangePrope(this);
         this.__initSearchControllers();
-        this.__addEventListeners();
         this.proximityLinkBooster = new ProximityLinkBooster(this,"list#name");
         this.__controllers.push(this.proximityLinkBooster);
-    }
-
-    __addEventListeners(){
-        for (let c of this.__controllers) {
-            this.statsRecorder.addEventEmitter(c);
+        if (this._config.ANALYTICS) {
+            this.statsRecorder = new StatsRecorder();
+            this.statsProbe = new NodeStatsProbe(this, 4000);
+            this.linkChangeProbe = new ProximityLinkChangePrope(this);
+            this.__addEventListeners();
         }
-
-        this.statsRecorder.addEventEmitter(this);
-        this.statsRecorder.addEventEmitter(this.statsProbe);
     }
+
     /**
      * Register a global list on this node
      * @param list
@@ -110,10 +102,22 @@ class Node extends EventEmitter{
      *
      * @param list
      * @param query
+     * @param timeout seconds after search request expires
      * @param searchResultCallback
      */
-    search(list,query,searchResultCallback){
-
+    search(list,query,timeout=60,searchResultCallback){
+        let searchRequest = new SearchRequest(this, query,list);
+        searchRequest.on("search_result", (packet) => {
+            searchResultCallback(packet);
+        });
+        this.attachController(searchRequest);
+        setTimeout(() => {
+            this._removeController(searchRequest);
+        }, timeout * 1000);
+        if (this._config.ANALYTICS) {
+            this.statsRecorder.addEventEmitter(searchRequest);
+        }
+        searchRequest.initiateSearch();
     }
 
     /**
@@ -122,6 +126,38 @@ class Node extends EventEmitter{
      */
     connectToNode(nodePointer){
 
+    }
+
+
+    startNode(){
+        this.__cyclonNode.on("shuffleCompleted",(direction)=>{
+            console.info("shuffle completed");
+        });
+
+        this.__cyclonNode.on("shuffleError", (direction) => {
+            console.error("shuffle error");
+        });
+
+        this.__cyclonNode.on("shuffleTimeout", (direction) => {
+            console.error("shuffle timeout");
+        });
+
+        console.info("starting node");
+        this.__cyclonNode.start();
+        console.info(this.__cyclonNode.createNewPointer());
+        this.__setupHandlerForNewRandomNeighborSet();
+        this.__listenForPackets();
+    }
+
+
+
+    __addEventListeners(){
+        for (let c of this.__controllers) {
+            this.statsRecorder.addEventEmitter(c);
+        }
+
+        this.statsRecorder.addEventEmitter(this);
+        this.statsRecorder.addEventEmitter(this.statsProbe);
     }
 
     __initSearchControllers() {
@@ -186,25 +222,6 @@ class Node extends EventEmitter{
 
     }
 
-    startNode(){
-        this.__cyclonNode.on("shuffleCompleted",(direction)=>{
-            console.info("shuffle completed");
-        });
-
-        this.__cyclonNode.on("shuffleError", (direction) => {
-            console.error("shuffle error");
-        });
-
-        this.__cyclonNode.on("shuffleTimeout", (direction) => {
-            console.error("shuffle timeout");
-        });
-
-        console.info("starting node");
-        this.__cyclonNode.start();
-        console.info(this.__cyclonNode.createNewPointer());
-        this.__setupHandlerForNewRandomNeighborSet();
-        this.__listenForPackets();
-    }
 
     /**
      *
@@ -357,6 +374,13 @@ class Node extends EventEmitter{
 
     attachController(controller) {
         this.__controllers.push(controller);
+    }
+
+    _removeController(controller){
+        console.log("removing search request controller");
+        this.__controllers = this.__controllers.filter((value => {
+            return value !== controller;
+        }));
     }
 
     getRandomSamplePointers(){
