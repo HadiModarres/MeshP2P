@@ -65,9 +65,7 @@ class EncounterIntervalProbe extends EventEmitter{
 
    _updateSamples(){
       let neighbors = this._node.getRandomSamplePointers();
-      let neighborIds = neighbors.map((value)=>{
-         return value.id;
-      });
+      let neighborIds = this._node.getRandomSampleIds();
       for (let sample of this.samples){
          if (neighborIds.includes(sample.id)){
              console.info("encountered");

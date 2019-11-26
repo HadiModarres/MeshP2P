@@ -6,7 +6,7 @@ let stringSimilarity = require("string-similarity");
 
 
 
-let node = new Node({SHUFFLE_SIZE:5});
+let node = new Node({});
 // let name = faker.name.firstName();
 // while (name.charAt(0) !== 'K') {
 //     name = faker.name.firstName();

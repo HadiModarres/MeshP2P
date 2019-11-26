@@ -16,7 +16,7 @@ let ProximityLinkBooster = require("./controllers/ProximityLinkBooster");
 let logger = console;
 
 class Node extends EventEmitter{
-    constructor(
+    constructor(inboundConnectionCallback,
         {
             NEIGHBOR_SIZE= 7,
             SHUFFLE_SIZE= 3,
@@ -42,10 +42,11 @@ class Node extends EventEmitter{
             ],
             DEFAULT_CHANNEL_STATE_TIMEOUT_MS= 30000,
             DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS= 5000,
-            ANALYTICS= false
+            ANALYTICS= true
         }
     ) {
         super();
+        this.inboundCb = inboundConnectionCallback;
 
         this._config = {};
         //how to do following assignments in one statement?
@@ -72,6 +73,8 @@ class Node extends EventEmitter{
             this.linkChangeProbe = new ProximityLinkChangePrope(this);
             this.__addEventListeners();
         }
+
+        this.__setupConnectionListener();
     }
 
     /**
@@ -121,18 +124,20 @@ class Node extends EventEmitter{
     }
 
     /**
-     * Connects to the node determined by nodePointer and returns an rtc data channel
+     * Connects to the node specified by nodePointer and returns an rtc data channel
      * @param nodePointer
      */
-    connectToNode(nodePointer){
-
+    async connectToNode(nodePointer){
+        let channel = await this.rtc.openChannel("data", nodePointer);
+        return channel.rtcDataChannel;
     }
 
 
+
     startNode(){
-        this.__cyclonNode.on("shuffleCompleted",(direction)=>{
-            console.info("shuffle completed");
-        });
+        // this.__cyclonNode.on("shuffleCompleted",(direction)=>{
+        //     console.info("shuffle completed");
+        // });
 
         this.__cyclonNode.on("shuffleError", (direction) => {
             console.error("shuffle error");
@@ -150,6 +155,12 @@ class Node extends EventEmitter{
     }
 
 
+    __setupConnectionListener(){
+        let self = this;
+        this.rtc.onChannel("data", function (data) {
+            self.inboundCb(data.rtcDataChannel);
+        });
+    }
 
     __addEventListeners(){
         for (let c of this.__controllers) {
@@ -201,8 +212,8 @@ class Node extends EventEmitter{
 
 // level 1
         this.rtc = new cyclonRtc.RTC(iceCandidateBatchingSignalling, channelFactory);
-        this.comms = new cyclonRtcComms.WebRTCComms(this.rtc, shuffleStateFactory, logger);
-        this.bootStrap = new cyclonRtcComms.SignallingServerBootstrap(signallingSocket, httpRequestService);
+        this.comms = new cyclonRtcComms.WebRTCComms(this.rtc, shuffleStateFactory, logger,["meshp2p"]);
+        this.bootStrap = new cyclonRtcComms.SignallingServerBootstrap(signallingSocket, httpRequestService,["meshp2p"]);
 
 
 // level 0
@@ -263,6 +274,7 @@ class Node extends EventEmitter{
 
     __setupHandlerForNewRandomNeighborSet(){
         this.__cyclonNode.on("shuffleCompleted", (direction,pointer)=> {
+            console.info(`${direction} shuffle complete. ${JSON.stringify(pointer)}`);
             let namesProxList = this.listManager.getAllProximityLists("list#name")[0];
             let beforeKeys = namesProxList.getAllElements().map((value) => {
                 return value.key;
@@ -384,12 +396,13 @@ class Node extends EventEmitter{
     }
 
     getRandomSamplePointers(){
-        return Object.values(this.__cyclonNode.getNeighbourSet().getContents());
+        return this.__cyclonNode.getNeighbourSet().getContents().values();
     }
     getRandomSampleIds(){
-        return Object.values(this.__cyclonNode.getNeighbourSet().getContents()).map((value => {
-            return value.id;
-        }));
+        return this.__cyclonNode.getNeighbourSet().getContents().keys();
+        // return Object.values(this.__cyclonNode.getNeighbourSet().getContents()).map((value => {
+        //     return value.id;
+        // }));
     }
     getId() {
         return this.__cyclonNode.getId();

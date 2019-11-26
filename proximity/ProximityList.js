@@ -91,6 +91,7 @@ class ProximityList extends EventEmitter{
         element.proximityScore = this.proximityFunc(this.referenceElement.key, element.key).toFixed(3);
         this._putElement(element);
         this.list = this.list.slice(0, this.maximumListSize);
+        console.info("new list: " + this.list);
     }
 
     addElements(elements) {
