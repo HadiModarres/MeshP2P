@@ -1,7 +1,7 @@
 {
   "name": "meshp2p",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "1.0.26",
+  "main": "node.js",
   "scripts": {
     "test": "mocha 'test/*' || true",
     "build": "browserify index.js -o bundle.js",

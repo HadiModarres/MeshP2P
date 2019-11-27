@@ -41,7 +41,7 @@ class SearchRelay extends NodeController{
             let refScore = bestProxList.proximityScoreComparedToRef(packet[constants.PACKET_FIELD.QUERY]);
 
             nearNodes = nearNodes.filter((value) => {
-                if (value.score>refScore){
+                if (value.score>=refScore){
                     return true;
                 }else{
                     return false;

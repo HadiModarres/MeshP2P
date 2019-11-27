@@ -410,4 +410,7 @@ class Node extends EventEmitter{
 
 }
 
-module.exports = Node;
+module.exports = {Node};
+
+
+
