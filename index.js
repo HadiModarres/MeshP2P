@@ -6,7 +6,7 @@ let stringSimilarity = require("string-similarity");
 
 
 
-let node = new Node({});
+let node = new Node((channel)=>{},{});
 // let name = faker.name.firstName();
 // while (name.charAt(0) !== 'K') {
 //     name = faker.name.firstName();
@@ -24,7 +24,6 @@ node.name= name;
 window.document.title = name;
 node.startNode();
 
-
 // let clientInfoService = new ClientInfoService(persistentStorage);
 let neighbourSet = node.__cyclonNode.getNeighbourSet();
 
@@ -38,22 +37,25 @@ window.onload = function () {
 
 let response_ids = {};
 global.runTest = function () {
-    console.info("running test");
-    let searchRequest = new SearchRequest(node, document.getElementById("new_name").value,"list#name");
+    console.info("running search");
+    // let searchRequest = new SearchRequest(node, document.getElementById("new_name").value,"list#name");
     document.getElementById("results").innerHTML="";
-    response_ids = {};
-    searchRequest.on("search_result", (packet) => {
-        if (!response_ids[packet.packet_id]){
-           response_ids[packet.packet_id]= 1;
-        }else {
-            response_ids[packet.packet_id]++;
-        }
-        document.getElementById("results").innerHTML =
-            "<div>" + JSON.stringify(response_ids)+"</div>";
+    // response_ids = {};
+    // searchRequest.on("search_result", (packet) => {
+    //     if (!response_ids[packet.packet_id]){
+    //        response_ids[packet.packet_id]= 1;
+    //     }else {
+    //         response_ids[packet.packet_id]++;
+    //     }
+    // });
+    // node.attachController(searchRequest);
+    // node.statsRecorder.addEventEmitter(searchRequest);
+    // searchRequest.initiateSearch();
+    node.search("list#name", document.getElementById("new_name").value, 60, (value) => {
+        console.info("called");
+        document.getElementById("results").innerHTML +=
+            "<div>" + JSON.stringify(value) + "</div>";
     });
-    node.attachController(searchRequest);
-    node.statsRecorder.addEventEmitter(searchRequest);
-    searchRequest.initiateSearch();
 };
 
 

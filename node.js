@@ -111,7 +111,7 @@ class Node extends EventEmitter{
     search(list,query,timeout=60,searchResultCallback){
         let searchRequest = new SearchRequest(this, query,list);
         searchRequest.on("search_result", (packet) => {
-            searchResultCallback(packet);
+            searchResultCallback(packet.body);
         });
         this.attachController(searchRequest);
         setTimeout(() => {
