@@ -6,7 +6,10 @@ let stringSimilarity = require("string-similarity");
 
 
 
-let node = new Node((channel)=>{},{});
+let node = new Node((channel)=>{
+    console.info("connection received!");
+    console.info(channel);
+},{});
 // let name = faker.name.firstName();
 // while (name.charAt(0) !== 'K') {
 //     name = faker.name.firstName();
@@ -53,8 +56,19 @@ global.runTest = function () {
     // searchRequest.initiateSearch();
     node.search("list#name", document.getElementById("new_name").value, 60, (value) => {
         console.info("called");
+        let point = JSON.stringify(value);
         document.getElementById("results").innerHTML +=
-            "<div>" + JSON.stringify(value) + "</div>";
+            `<div> ${JSON.stringify(value)} </div>`;
+    });
+};
+
+global.connectBtnClicked = function () {
+    // console.info(document.getElementById("pointer").innerText);
+    let pointer = JSON.parse(document.getElementById("pointer").value);
+    node.connectToNode(pointer).then((rtcDataChannel) => {
+
+        console.info("connected!");
+        console.info(rtcDataChannel);
     });
 };
 
