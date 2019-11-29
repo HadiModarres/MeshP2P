@@ -378,10 +378,9 @@ class Node extends EventEmitter{
                 channel.send("unionp2p", {
                     data: obj
                 });
-            channel.rtcDataChannel.onclose = () => {
-                channel.close();
-            };
-
+                setTimeout(()=>{
+                   channel.close();
+                },5000)
         });
     }
 

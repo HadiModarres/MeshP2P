@@ -25,8 +25,8 @@ class ProximityLinkBooster extends NodeController{
     }
 
     _startSendTimer(){
-        return;
-        console.log("sending");
+        // return;
+        // console.log("sending");
         // this._sendProximityLinks();
         let proxLists = this.node.listManager.getAllProximityLists(this._globalList);
         if (proxLists) {
