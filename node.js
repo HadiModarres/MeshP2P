@@ -331,13 +331,17 @@ class Node extends EventEmitter{
     __listenForPackets(){
         let self =this;
         this.rtc.onChannel("search", function (data) {
-            data.receive("unionp2p", 30000).then((message) => {
+            data.receive("unionp2p", 20000).then((message) => {
                 console.info("data received!");
                 console.info(message);
                 self.__handleReceivedPacket(message.data);
+                data.rtcDataChannel.close();
                 data.close();
                 self.__listenForPackets();
-            });
+            },(reason => {
+                data.rtcDataChannel.close();
+                data.close();
+            }));
         });
     }
 
@@ -374,6 +378,10 @@ class Node extends EventEmitter{
                 channel.send("unionp2p", {
                     data: obj
                 });
+            channel.rtcDataChannel.onclose = () => {
+                channel.close();
+            };
+
         });
     }
 
@@ -402,10 +410,10 @@ class Node extends EventEmitter{
     }
 
     getRandomSamplePointers(){
-        return this.__cyclonNode.getNeighbourSet().getContents().values();
+        return Array.from(this.__cyclonNode.getNeighbourSet().getContents().values());
     }
     getRandomSampleIds(){
-        return this.__cyclonNode.getNeighbourSet().getContents().keys();
+        return Array.from(this.__cyclonNode.getNeighbourSet().getContents().keys());
         // return Object.values(this.__cyclonNode.getNeighbourSet().getContents()).map((value => {
         //     return value.id;
         // }));
