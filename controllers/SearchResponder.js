@@ -44,7 +44,7 @@ class SearchResponder extends NodeController{
             let match = proxList.queryHit(packet[constants.PACKET_FIELD.QUERY]);
             if(match){
                 console.info("query was hit");
-                return proxList.referenceElement;
+                return {key: proxList.referenceElement.key,value:this.node.__cyclonNode.createNewPointer()};
             }
         }
         return undefined;
