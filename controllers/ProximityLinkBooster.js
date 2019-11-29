@@ -16,7 +16,6 @@ class ProximityLinkBooster extends NodeController{
     handlePacket(packet){
         if (packet[constants.PACKET_FIELD.PACKET_TYPE] !== constants.PACKET_TYPE.PROXIMITY_LINKS ||
             packet[constants.PACKET_FIELD.LIST !== this._globalList]) {
-            console.error("cant handle: "+ packet[constants.PACKET_FIELD.PACKET_TYPE]);
             return false;
         }
         this.node._handlePointerSet(packet[constants.PACKET_FIELD.POINTERS]);
@@ -26,6 +25,7 @@ class ProximityLinkBooster extends NodeController{
     }
 
     _startSendTimer(){
+        return;
         console.log("sending");
         // this._sendProximityLinks();
         let proxLists = this.node.listManager.getAllProximityLists(this._globalList);

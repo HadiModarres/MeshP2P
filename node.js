@@ -82,9 +82,10 @@ class Node extends EventEmitter{
      * @param list
      * @param proximityFunction (a,b)->float 0 to 1, 1 being identical and 0 least similar
      *
+     * @param responseMinScore
      */
-    registerList(list,proximityFunction){
-        this.listManager.addGlobalList(list, proximityFunction);
+    registerList(list,proximityFunction, responseMinScore){
+        this.listManager.addGlobalList(list, proximityFunction, responseMinScore);
     }
 
     /**
@@ -341,14 +342,16 @@ class Node extends EventEmitter{
 
     __handleReceivedPacket(packet) {
         console.log(this.__controllers.length);
+        console.info(`handling packet ${JSON.stringify(packet)}`);
         for (let controller of this.__controllers) {
             console.info("testing controller");
-            if (controller.handlePacket(packet))
-                return;
+            // if (controller.handlePacket(packet))
+            //     return;
+            controller.handlePacket(packet);
         }
-        console.error(packet[constants.PACKET_FIELD.PACKET_TYPE]);
-        let stats_obj = {event:constants.EVENTS.SEARCH_DISCARDED,id:packet[constants.PACKET_FIELD.PACKET_ID],source_name:this.name};
-        this.emit("stats", stats_obj);
+        // console.error(packet[constants.PACKET_FIELD.PACKET_TYPE]);
+        // let stats_obj = {event:constants.EVENTS.SEARCH_DISCARDED,id:packet[constants.PACKET_FIELD.PACKET_ID],source_name:this.name};
+        // this.emit("stats", stats_obj);
         // let httpReq = new cyclonRtc.HttpRequestService();
         // httpReq.get(`http://localhost:3500/stats/search_discarded?id=${packet[constants.PACKET_FIELD.PACKET_ID]}&node_name=${this.name}`);
     }
@@ -359,12 +362,7 @@ class Node extends EventEmitter{
      * @param {uuid} targetNodeId
      */
     sendObjectToNode(obj, targetNodePointer) {
-        // let targetPointer = this.__getNodePointerForNodeUUID(targetNodeId);
-        // if (!targetPointer)
-        //     throw new Error(`pointer with id ${targetNodeId} doesnt exist`);
         this.rtc.openChannel("search", targetNodePointer).then((channel) => {
-            // console.info(channel);
-            console.error("before send");
                 channel.send("unionp2p", {
                     data: obj
                 });

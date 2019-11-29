@@ -33,6 +33,12 @@ class SearchRequest extends NodeController{
          // let httpReq = new cyclonRtc.HttpRequestService();
          // httpReq.get(`http://localhost:3500/stats/search_started?id=${this.id}&source_name=${this.node.name}&query=${this.searchTerm}`);
       }
+      if (neighborIds.length===0){
+         for (let elem of this.node.listManager.getAllProximityLists(this.list)[0].getAllElements()){
+            this.sendOutPacket(packet,elem.value);
+         }
+      }
+
    }
 
    handlePacket(packet){

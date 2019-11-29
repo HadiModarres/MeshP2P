@@ -12,13 +12,14 @@ class ProximityList extends EventEmitter{
      * @param referenceElement
      * @param proximityFunc (a,b) => float n,  0<n<1
      */
-    constructor(maximumListSize, referenceElement, proximityFunc) {
+    constructor(maximumListSize, referenceElement, proximityFunc, minResponseScore) {
         super();
         this.list = [];
         this.maximumListSize = maximumListSize;
         this.proximityFunc = proximityFunc;
         this.referenceElement = referenceElement;
         this.inboundListSize = 10;
+        this.minResponseScore= minResponseScore;
         // this.inboundList = [];
     }
 
@@ -29,6 +30,10 @@ class ProximityList extends EventEmitter{
      */
     proximityScoreComparedToRef(key) {
         return this.proximityFunc(this.referenceElement.key, key);
+    }
+
+    queryHit(query){
+        return this.proximityFunc(this.referenceElement.key, query) > this.minResponseScore;
     }
 
 
@@ -91,7 +96,7 @@ class ProximityList extends EventEmitter{
         element.proximityScore = this.proximityFunc(this.referenceElement.key, element.key).toFixed(3);
         this._putElement(element);
         this.list = this.list.slice(0, this.maximumListSize);
-        console.info("new list: " + this.list);
+        // console.info("new list: " + this.list);
     }
 
     addElements(elements) {

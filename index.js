@@ -1,4 +1,4 @@
-let Node = require("./node");
+let Node = require("./node").Node;
 let faker = require("faker");
 let SearchRequest = require("./controllers/SearchRequest");
 let SearchResponder = require("./controllers/SearchResponder");
@@ -20,8 +20,8 @@ node.registerList("list#name", (a, b) =>{
     let y1 = a.split(",")[1];
     let x2 = b.split(",")[0];
     let y2 = b.split(",")[1];
-    return 2000-Math.sqrt(Math.pow(Math.abs(x1-x2),2)+Math.pow(Math.abs(y1-y2),2));
-});
+    return 1/Math.sqrt(Math.pow(Math.abs(x1-x2),2)+Math.pow(Math.abs(y1-y2),2));
+},0.2);
 node.setEntries("list#name", [name]);
 node.name= name;
 window.document.title = name;

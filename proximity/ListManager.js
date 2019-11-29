@@ -10,13 +10,18 @@ class ListManager {
         this.inboundListSize = 5;
     }
 
-    addGlobalList(globalList, proximityFunction) {
+    addGlobalList(globalList, proximityFunction, responseMinScore) {
         for (let list of this.lists) {
             if (list.listName === globalList) {
                 throw new Error(`global list "${globalList}" exists already`);
             }
         }
-        let newGlobalList = {listName: globalList, lists: [], proximityFunction: proximityFunction, inboundList: []};
+        let newGlobalList =
+            {listName: globalList,
+            lists: [],
+            proximityFunction: proximityFunction,
+            inboundList: [],
+            responseMinScore: responseMinScore};
         this.lists.push(newGlobalList);
 
     }
@@ -91,7 +96,7 @@ class ListManager {
                     return;
                 }
             }
-            let proxList = new ProximityList(this.proximityListSize, entry, list.proximityFunction);
+            let proxList = new ProximityList(this.proximityListSize, entry, list.proximityFunction, list.responseMinScore);
             list.lists.push(proxList);
         }
     }
