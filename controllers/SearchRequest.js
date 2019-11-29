@@ -38,13 +38,14 @@ class SearchRequest extends NodeController{
             this.sendOutPacket(packet,elem.value);
          }
       }
+      this.node.handledPacketIds.push(packet[constants.PACKET_FIELD.PACKET_ID]);
 
    }
 
    handlePacket(packet){
       if (packet[constants.PACKET_FIELD.PACKET_TYPE] !== constants.PACKET_TYPE.SEARCH_RES)
          return false;
-      if (this.id !== packet[constants.PACKET_FIELD.PACKET_ID])
+      if (this.id !== packet[constants.PACKET_FIELD.REQUEST_ID])
          return false;
       console.info("received response for request: " + this.id +" response from: "+packet[constants.PACKET_FIELD.PACKET_SOURCE]);
       this.responses.push(packet);

@@ -8,6 +8,7 @@ module.exports.PACKET_FIELD = {
    DATE_TIME: "date_time",
    PACKET_TYPE: "packet_type",
    PACKET_ID: "packet_id",
+   REQUEST_ID: "request_id",
    PACKET_SOURCE: "packet_source",
    QUERY: "query",
    HOPS: "hops",

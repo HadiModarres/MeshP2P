@@ -75,6 +75,7 @@ class Node extends EventEmitter{
         }
 
         this.__setupConnectionListener();
+        this.handledPacketIds = [];
     }
 
     /**
@@ -341,6 +342,9 @@ class Node extends EventEmitter{
     }
 
     __handleReceivedPacket(packet) {
+        if (this.handledPacketIds.includes(packet[constants.PACKET_FIELD.PACKET_ID])) {
+            return;
+        }
         console.log(this.__controllers.length);
         console.info(`handling packet ${JSON.stringify(packet)}`);
         for (let controller of this.__controllers) {
@@ -349,6 +353,10 @@ class Node extends EventEmitter{
             //     return;
             controller.handlePacket(packet);
         }
+        if (this.handledPacketIds.length>500){
+            this.handledPacketIds = [];
+        }
+        this.handledPacketIds.push(packet[constants.PACKET_FIELD.PACKET_ID]);
         // console.error(packet[constants.PACKET_FIELD.PACKET_TYPE]);
         // let stats_obj = {event:constants.EVENTS.SEARCH_DISCARDED,id:packet[constants.PACKET_FIELD.PACKET_ID],source_name:this.name};
         // this.emit("stats", stats_obj);
