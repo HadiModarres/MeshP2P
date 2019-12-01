@@ -8,7 +8,8 @@
 MeshP2P is a framework that allows bootstrapping the development of a distributed application over web browsers using WebRTC. 
 It allows for discovery of other peers without requiring a central server. This is done through regular exchange of information between peers. 
 
-##Usage
+
+## Usage
 npm install meshp2p --save
 
 #### Importing in your js code
@@ -46,7 +47,7 @@ Assuming two signalling servers are running locally on ports 12345 and 12346:
             ]});
 ```
 
-See (#signalling-servers) on how to start signalling servers.
+See [Signalling Servers](#signalling-servers) on how to start signalling servers.
 
 ### registerList
 
@@ -159,4 +160,9 @@ This runs a signalling server on port:12345
 
 Peers in the network should have access to at least one signalling server, and this should be specified in the node constructor when 
 creating peers. 
+
+
+##Demo
+Check following for a demo p2p chat application based on MeshP2P and React:
+https://github.com/HadiModarres/meshp2p_chat
 
