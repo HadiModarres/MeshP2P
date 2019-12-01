@@ -10,10 +10,14 @@ It allows for discovery of other peers without requiring a central server. This 
 
 
 ## Usage
+```
 npm install meshp2p --save
+```
 
 #### Importing in your js code
+```
 const Node = require("meshp2p").Node;
+```
 
 ## API
 
@@ -162,7 +166,7 @@ Peers in the network should have access to at least one signalling server, and t
 creating peers. 
 
 
-##Demo
+## Demo
 Check following for a demo p2p chat application based on MeshP2P and React:
 https://github.com/HadiModarres/meshp2p_chat
 
