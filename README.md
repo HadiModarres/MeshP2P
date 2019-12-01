@@ -50,3 +50,46 @@ Consider a network of peers with each peer having a coordinate in 2D space. In t
 registerList("list#coordinates", (entry1,entry2) => {return 1/euclideanDist(entry1,entry2), 1/4}
 ```
 
+### setEntries
+
+Set the entries for the current node in the specified network list.
+
+##### Arguments
+1. list (string): The global list
+2. entries (object[]): the entries for this node 
+
+##### Returns
+Void.  
+
+##### Examples
+```
+setEntries("list#names", ["Jack"])
+```
+
+```
+setEntries("list#coordinates",[{x: 3,y:12}])
+```
+
+### Search
+
+Search the network. 
+
+##### Arguments
+1. list(string): The global list to search
+2. query(obj): The query. The query should have the form of list entry, and will be fed to the provided proximityFunction provided. 
+3. timeout(int): Number of seconds to wait for responses from the network. After that, the resources are freed and responses for this query aren't handled. 
+4. searchResultCallback(func): The callback is called each time a response is received from the network. The response is passed to the callback function and has the form: {key,value}. key is the entry that caused a match, and the value is the nodePointer of the peer that has responded to the query. 
+
+##### Examples
+```
+search("list#names", "jacky", 60, (response)=>{
+// do something with the response
+});
+```
+
+```
+search("list#coordinates", {x:2,y:2}, 60, (response)=>{
+// do something with the response
+});
+```
+
