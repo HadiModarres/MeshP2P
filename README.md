@@ -16,11 +16,42 @@ const Node = require("meshp2p").Node;
 
 ## API
 
-MeshP2P allows for multiple lists to exist in the network, and each node is able to register multiple entries in each list.
+
+### Node Constructor
+As a minimum a callback for incoming rtc connections, and an array of signalling servers should be provided to the Node constructor. 
+
+##### Arguments
+1. InboundCb (func): a function that is called when another peer makes a connection to this node. The rtcDataChannel will provided 
+as an argument to the callback function. 
+2. Options (Obj): parameters, DEFAULT_SIGNALLING_SERVERS is required
+
+##### Example
+Assuming two signalling servers are running locally on ports 12345 and 12346:
+```
+   node = new Node((rtcDataChannel)=>{
+            // do something with inbound connection
+        },{DEFAULT_SIGNALLING_SERVERS:[
+                {
+                    "socket": {
+                        "server": "http://127.0.0.1:12345"
+                    },
+                    "signallingApiBase": "http://127.0.0.1:12345"
+                },
+                {
+                    "socket": {
+                        "server": "http://127.0.0.1:12346"
+                    },
+                    "signallingApiBase": "http://127.0.0.1:12346"
+                }
+            ]});
+```
+
+See (#signalling-servers) on how to start signalling servers.
 
 ### registerList
 
-Make a global list in the network known to the current node. 
+MeshP2P allows for multiple lists to exist in the network, and each node is able to register multiple entries in each list.
+Make a global list in the network using registerList. 
 
 ##### Arguments
 1. list (string): The name of the list
@@ -92,4 +123,40 @@ search("list#coordinates", {x:2,y:2}, 60, (response)=>{
 // do something with the response
 });
 ```
+
+### connectToNode
+
+##### Arguments
+nodePointer(nodePointerObj): The node pointer of the peer to connect to.
+
+##### Returns
+A promise that is resolved with an rtcDataChannel (https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel) when successfully connected to the target peer.
+
+##### Examples
+
+```
+node.search("list#names", "jacky", 60, (response)=>{
+   node.connectToNode(response.value).then(rtcDataChannel)=>{
+       rtcDataChannel.send("hello"); }) 
+});
+```
+
+### startNode
+Starts the node. Start node only after specifying the global list and the node's entries in the list. 
+
+##### Arguments
+None
+
+
+## Signalling Servers
+
+WebRTC requires the use of signalling servers so that peers can negotiate for a connection. Signalling servers are provided as part of MeshP2P
+and can be easily started using:
+```
+npm run server -- 12345
+```
+This runs a signalling server on port:12345
+
+Peers in the network should have access to at least one signalling server, and this should be specified in the node constructor when 
+creating peers. 
 

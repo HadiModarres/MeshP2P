@@ -42,7 +42,7 @@ class Node extends EventEmitter{
             ],
             DEFAULT_CHANNEL_STATE_TIMEOUT_MS= 30000,
             DEFAULT_SIGNALLING_SERVER_RECONNECT_DELAY_MS= 5000,
-            ANALYTICS= true
+            ANALYTICS= false
         }
     ) {
         super();
