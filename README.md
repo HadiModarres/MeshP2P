@@ -75,7 +75,7 @@ Consider a network with a list of names of peers. In this case it's natural to c
 
 
 ```
-registerList("list#name", (str1, str2) => {return stringSimilarity(str1,str2), 0.7}
+registerList("list#name", (str1, str2) => {return stringSimilarity(str1,str2)}, 0.7)
 ```
 
 ##### Example 2
@@ -83,7 +83,7 @@ registerList("list#name", (str1, str2) => {return stringSimilarity(str1,str2), 0
 Consider a network of peers with each peer having a coordinate in 2D space. In this case one can define the closeness to be inverse of their euclidean distance, and a distance of less than 4 to consider a hit: 
 
 ```
-registerList("list#coordinates", (entry1,entry2) => {return 1/euclideanDist(entry1,entry2), 1/4}
+registerList("list#coordinates", (entry1,entry2) => {return 1/euclideanDist(entry1,entry2)}, 1/4)
 ```
 
 ### setEntries
