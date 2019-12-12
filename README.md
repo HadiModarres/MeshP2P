@@ -166,7 +166,5 @@ Peers in the network should have access to at least one signalling server, and t
 creating peers. 
 
 
-## Demo
-Check following for a demo p2p chat application based on MeshP2P and React:
-https://github.com/HadiModarres/meshp2p_chat
+
 
