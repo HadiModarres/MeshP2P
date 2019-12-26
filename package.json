@@ -1,6 +1,6 @@
 {
   "name": "meshp2p",
-  "version": "1.0.29",
+  "version": "1.0.30",
   "main": "node.js",
   "scripts": {
     "test": "mocha 'test/*' || true",
@@ -9,6 +9,13 @@
   },
   "keywords": [
     "browser",
+    "network",
+    "mesh",
+    "search",
+    "distributed",
+    "distributed search",
+    "discovery",
+    "vicinity",
     "p2p",
     "webrtc",
     "cyclon",
